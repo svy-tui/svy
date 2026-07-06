@@ -254,3 +254,6 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Claude作業用ドキュメント（投稿ドラフト等、リポジトリには含めない）
+claudedocs/
