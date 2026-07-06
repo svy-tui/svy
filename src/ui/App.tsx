@@ -253,7 +253,7 @@ export function App({ hosts: initialHosts, loadDate }: AppProps) {
     <Box flexDirection="column">
       <Box>
         <Text bold color="cyan">
-          sadf-view{' '}
+          svy{' '}
         </Text>
         <Text bold>{host.nodename}</Text>
         {hostsForDate.length > 1 && (

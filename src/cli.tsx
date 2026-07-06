@@ -10,13 +10,13 @@ import type { HostData } from './model.js';
 import { parseSadfJson } from './parse.js';
 import { App } from './ui/App.js';
 
-const HELP = `sadf-view — interactive terminal viewer for sysstat/sar data
+const HELP = `svy — system viewer for sar (interactive terminal viewer for sysstat data)
 
 Usage:
-  sadf -j -- -A | sadf-view          view piped sadf JSON
-  sadf-view <file.json>...           view saved sadf JSON files (multiple days ok)
-  sadf-view --host <ssh-host> [saXX] run sadf -j on a remote host via ssh
-  sadf-view --demo                   explore with synthetic demo data
+  sadf -j -- -A | svy          view piped sadf JSON
+  svy <file.json>...           view saved sadf JSON files (multiple days ok)
+  svy --host <ssh-host> [saXX] run sadf -j on a remote host via ssh
+  svy --demo                   explore with synthetic demo data
 
 Options:
   --demo          generate 24h of synthetic data (no sysstat required)
@@ -61,7 +61,7 @@ function parseArgs(argv: string[]): Args {
 }
 
 function fail(msg: string): never {
-  console.error(`sadf-view: ${msg}`);
+  console.error(`svy: ${msg}`);
   process.exit(1);
 }
 
@@ -143,7 +143,7 @@ function interactiveStdin(): tty.ReadStream | undefined {
   try {
     return new tty.ReadStream(fs.openSync('/dev/tty', 'r'));
   } catch {
-    console.error('sadf-view: /dev/tty unavailable — keyboard input disabled (pass a file argument instead of piping)');
+    console.error('svy: /dev/tty unavailable — keyboard input disabled (pass a file argument instead of piping)');
     return undefined;
   }
 }
