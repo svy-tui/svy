@@ -30,9 +30,9 @@ an incident window, flip between days, and switch across CPU / memory / network
 / disk — right in the terminal where the data lives. No files generated, no GUI,
 no agent to install on servers.
 
-<p align="center"><img src="https://raw.githubusercontent.com/svy-tui/svy/main/assets/shot-cpu.png" width="880" alt="svy — CPU view with braille chart"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/svy-tui/svy/main/assets/demo.gif" width="880" alt="svy — recorded interactive demo session"></p>
 
-*(actual `svy --demo` output in a 100×24 terminal)*
+*(recorded `svy --demo` session — try it yourself: `npx @svy-tui/svy --demo`)*
 
 ## Try it in 10 seconds (no sysstat required)
 
@@ -171,6 +171,9 @@ node dist/cli.js --demo
 To regenerate the README screenshots (`assets/shot-*.png`), run
 `./scripts/shots.sh` — see the header of that script for prerequisites
 (tmux, aha, Google Chrome, Cascadia Code font).
+
+The demo GIF (`assets/demo.gif`) is recorded with [vhs](https://github.com/charmbracelet/vhs):
+`vhs scripts/demo.tape`.
 
 The chart renderer is a hand-rolled braille canvas (no chart library), the
 sadf JSON parser absorbs field-name differences between sysstat versions

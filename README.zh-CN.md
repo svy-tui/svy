@@ -28,9 +28,9 @@
 在 CPU / 内存 / 网络 / 磁盘之间切换——一切都在数据所在的终端里完成。不生成任何
 文件，不需要 GUI，也不用在服务器上安装任何 agent。
 
-<p align="center"><img src="https://raw.githubusercontent.com/svy-tui/svy/main/assets/shot-cpu.png" width="880" alt="svy — CPU view with braille chart"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/svy-tui/svy/main/assets/demo.gif" width="880" alt="svy — recorded interactive demo session"></p>
 
-*（`svy --demo` 的真实终端输出）*
+*（`svy --demo` 的操作录像，可用 `npx @svy-tui/svy --demo` 亲自体验）*
 
 ## 10 秒上手（无需 sysstat）
 
@@ -161,6 +161,9 @@ node dist/cli.js --demo
 
 README 的截图（`assets/shot-*.png`）可以用 `./scripts/shots.sh` 重新生成，
 前置工具（tmux、aha、Google Chrome、Cascadia Code 字体）见脚本开头的注释。
+
+演示 GIF（`assets/demo.gif`）用 [vhs](https://github.com/charmbracelet/vhs) 录制：
+`vhs scripts/demo.tape`
 
 图表渲染器是手写的盲文点阵画布（不依赖图表库），sadf JSON 解析器以声明式方式
 吸收 sysstat 各版本间字段名的差异，所有导航逻辑都是带测试的纯函数。
