@@ -1,13 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { render } from 'ink-testing-library';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { parseSadfJson } from '../src/parse.js';
 import { App } from '../src/ui/App.js';
 
-const hosts = parseSadfJson(
-  readFileSync(join(import.meta.dirname, 'fixtures/sample.json'), 'utf8'),
-);
+const fixtureText = readFileSync(join(import.meta.dirname, 'fixtures/sample.json'), 'utf8');
+const hosts = parseSadfJson(fixtureText);
+const onDate = (date: string) => parseSadfJson(fixtureText.replaceAll('2026-07-05', date));
 
 const tick = () => new Promise((r) => setTimeout(r, 0));
 
@@ -73,6 +73,54 @@ describe('App', () => {
     stdin.write('?');
     await tick();
     expect(lastFrame()).not.toContain('Keybindings');
+    unmount();
+  });
+});
+
+describe('日付切り替え', () => {
+  const multiDay = [...hosts, ...onDate('2026-07-06')];
+
+  it('初期表示は最新日で、,と.で日付を行き来する', async () => {
+    const { lastFrame, stdin, unmount } = render(<App hosts={multiDay} />);
+    expect(lastFrame()).toContain('2026-07-06 (2/2)');
+    stdin.write(',');
+    await tick();
+    expect(lastFrame()).toContain('2026-07-05 (1/2)');
+    stdin.write('.');
+    await tick();
+    expect(lastFrame()).toContain('2026-07-06 (2/2)');
+    unmount();
+  });
+
+  it('端を越えるとローダーで前日を取得して表示する', async () => {
+    const loader = vi.fn(async (date: string) => onDate(date));
+    const { lastFrame, stdin, unmount } = render(<App hosts={hosts} loadDate={loader} />);
+    stdin.write(',');
+    await tick();
+    await tick();
+    expect(loader).toHaveBeenCalledWith('2026-07-04');
+    expect(lastFrame()).toContain('2026-07-04 (1/2)');
+    unmount();
+  });
+
+  it('ローダー失敗はメッセージを表示して現在日に留まる', async () => {
+    const loader = vi.fn(async () => {
+      throw new Error('no data file');
+    });
+    const { lastFrame, stdin, unmount } = render(<App hosts={hosts} loadDate={loader} />);
+    stdin.write(',');
+    await tick();
+    await tick();
+    expect(lastFrame()).toContain('no data file');
+    expect(lastFrame()).toContain('2026-07-05');
+    unmount();
+  });
+
+  it('ローダーなしで端に達すると案内を表示する', async () => {
+    const { lastFrame, stdin, unmount } = render(<App hosts={hosts} />);
+    stdin.write(',');
+    await tick();
+    expect(lastFrame()).toContain('--host');
     unmount();
   });
 });

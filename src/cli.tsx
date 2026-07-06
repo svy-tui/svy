@@ -4,7 +4,9 @@ import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import tty from 'node:tty';
 import { render } from 'ink';
+import { daysBetween, todayISO } from './dates.js';
 import { generateDemoJson } from './demo.js';
+import type { HostData } from './model.js';
 import { parseSadfJson } from './parse.js';
 import { App } from './ui/App.js';
 
@@ -12,27 +14,28 @@ const HELP = `sadf-view — interactive terminal viewer for sysstat/sar data
 
 Usage:
   sadf -j -- -A | sadf-view          view piped sadf JSON
-  sadf-view <file.json>              view a saved sadf JSON file
+  sadf-view <file.json>...           view saved sadf JSON files (multiple days ok)
   sadf-view --host <ssh-host> [saXX] run sadf -j on a remote host via ssh
   sadf-view --demo                   explore with synthetic demo data
 
 Options:
   --demo          generate 24h of synthetic data (no sysstat required)
-  --host <host>   ssh host; runs \`sadf -j [file] -- -A\` remotely
+  --host <host>   ssh host; runs \`sadf -j [file] -- -A\` remotely.
+                  < / > keys then fetch adjacent days on demand (sadf -j -N)
   -h, --help      show this help
   -V, --version   show version
 
 Keys:
-  ↑↓/kj metric · ←→/hl cursor · Tab/[] instance · +/- zoom · 0 reset · ? help · q quit`;
+  ↑↓/kj metric · ←→/hl cursor · Tab/[] instance · <>/,. day · +/- zoom · ? help · q quit`;
 
 interface Args {
-  file?: string;
+  files: string[];
   demo: boolean;
   host?: string;
 }
 
 function parseArgs(argv: string[]): Args {
-  const args: Args = { demo: false };
+  const args: Args = { files: [], demo: false };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '-h' || a === '--help') {
@@ -49,12 +52,11 @@ function parseArgs(argv: string[]): Args {
       if (!args.host) fail('--host requires an argument');
     } else if (a.startsWith('-')) {
       fail(`unknown option: ${a}\n\n${HELP}`);
-    } else if (args.file) {
-      fail('only one input file can be given');
     } else {
-      args.file = a;
+      args.files.push(a);
     }
   }
+  if (args.host && args.files.length > 1) fail('--host accepts at most one remote file');
   return args;
 }
 
@@ -73,26 +75,65 @@ function readAllStdin(): Promise<string> {
   });
 }
 
-function fetchViaSsh(host: string, file?: string): Promise<string> {
-  const remoteCmd = file ? `sadf -j ${file} -- -A` : 'sadf -j -- -A';
+function runSsh(host: string, remoteCmd: string): Promise<string> {
   return new Promise((resolve, reject) => {
-    const child = spawn('ssh', [host, remoteCmd], { stdio: ['ignore', 'pipe', 'inherit'] });
+    // TUI表示中にも呼ばれるため、stderrは画面に流さずエラーメッセージに含める
+    const child = spawn('ssh', [host, remoteCmd], { stdio: ['ignore', 'pipe', 'pipe'] });
     let out = '';
+    let err = '';
     child.stdout.setEncoding('utf8');
+    child.stderr.setEncoding('utf8');
     child.stdout.on('data', (c) => (out += c));
+    child.stderr.on('data', (c) => (err += c));
     child.on('error', reject);
     child.on('close', (code) => {
       if (code === 0) resolve(out);
-      else reject(new Error(`ssh ${host} "${remoteCmd}" exited with code ${code}`));
+      else reject(new Error(err.trim().split('\n').pop() || `ssh exited with code ${code}`));
     });
   });
 }
 
-async function loadInput(args: Args): Promise<string> {
-  if (args.demo) return generateDemoJson();
-  if (args.host) return fetchViaSsh(args.host, args.file);
-  if (args.file) return fs.readFileSync(args.file, 'utf8');
-  if (!process.stdin.isTTY) return readAllStdin();
+function parseFile(path: string): HostData[] {
+  let text: string;
+  try {
+    text = fs.readFileSync(path, 'utf8');
+  } catch (e) {
+    fail(e instanceof Error ? e.message : String(e));
+  }
+  try {
+    return parseSadfJson(text);
+  } catch (e) {
+    fail(`${path}: ${e instanceof Error ? e.message : String(e)}`);
+  }
+}
+
+// sadf の「-N = N日前のデータファイル」指定を使うことで、
+// saDD ファイルの置き場所（/var/log/sysstat, /var/log/sa 等）の差異を吸収する。
+// 日数はビューア側のローカル日付基準なので、サーバとTZが大きくずれると1日ぶれうる。
+function makeSshDateLoader(host: string): (date: string) => Promise<HostData[]> {
+  return async (date) => {
+    const offset = daysBetween(todayISO(), date);
+    if (offset < 0) throw new Error('date is in the future');
+    const remoteCmd = offset === 0 ? 'sadf -j -- -A' : `sadf -j -${offset} -- -A`;
+    return parseSadfJson(await runSsh(host, remoteCmd));
+  };
+}
+
+interface Loaded {
+  hosts: HostData[];
+  loadDate?: (date: string) => Promise<HostData[]>;
+}
+
+async function loadInput(args: Args): Promise<Loaded> {
+  if (args.demo) return { hosts: parseSadfJson(generateDemoJson()) };
+  if (args.host) {
+    const file = args.files[0];
+    const remoteCmd = file ? `sadf -j ${file} -- -A` : 'sadf -j -- -A';
+    const text = await runSsh(args.host, remoteCmd);
+    return { hosts: parseSadfJson(text), loadDate: makeSshDateLoader(args.host) };
+  }
+  if (args.files.length > 0) return { hosts: args.files.flatMap(parseFile) };
+  if (!process.stdin.isTTY) return { hosts: parseSadfJson(await readAllStdin()) };
   fail(`no input\n\n${HELP}`);
 }
 
@@ -110,22 +151,18 @@ function interactiveStdin(): tty.ReadStream | undefined {
 async function main() {
   const args = parseArgs(process.argv.slice(2));
 
-  let text: string;
+  let loaded: Loaded;
   try {
-    text = await loadInput(args);
-  } catch (e) {
-    fail(e instanceof Error ? e.message : String(e));
-  }
-
-  let hosts;
-  try {
-    hosts = parseSadfJson(text);
+    loaded = await loadInput(args);
   } catch (e) {
     fail(e instanceof Error ? e.message : String(e));
   }
 
   const stdin = interactiveStdin();
-  const { waitUntilExit } = render(<App hosts={hosts} />, stdin ? { stdin } : undefined);
+  const { waitUntilExit } = render(
+    <App hosts={loaded.hosts} loadDate={loaded.loadDate} />,
+    stdin ? { stdin } : undefined,
+  );
   await waitUntilExit();
   stdin?.destroy();
 }

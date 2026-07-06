@@ -63,10 +63,19 @@ ssh web01 'sadf -j -- -A' | sadf-view
 sadf-view --host web01                      # same thing, shorthand
 sadf-view --host web01 /var/log/sysstat/sa05
 
-# From a saved file
-sadf -j -- -A > snapshot.json
-sadf-view snapshot.json
+# From saved files — pass several days and flip through them with < / >
+sadf -j -- -A > today.json
+sadf -j -1 -- -A > yesterday.json
+sadf-view today.json yesterday.json
 ```
+
+### Browsing across days
+
+sar keeps one data file per day. With `--host`, pressing `<` / `>` past the
+edge of the loaded data fetches the adjacent day on demand (running
+`sadf -j -N -- -A` remotely, so it works regardless of where the distro stores
+its `saDD` files). With local files, every file you pass becomes a day you can
+flip through.
 
 sysstat is only needed on the machine that *produced* the data. sadf-view
 itself runs anywhere Node.js ≥ 18.18 runs (Linux, macOS, Windows Terminal).
@@ -81,6 +90,7 @@ itself runs anywhere Node.js ≥ 18.18 runs (Linux, macOS, Windows Terminal).
 | `↑`/`↓` or `k`/`j` | select metric |
 | `←`/`→` or `h`/`l` | move time cursor (`H`/`L` for big steps) |
 | `Tab` / `[` `]` | switch instance (per-CPU, NIC, disk device) |
+| `<` / `>` or `,` `.` | previous / next day |
 | `+` / `-` | zoom in / out around the cursor |
 | `0` | reset zoom |
 | `g` / `G` | jump to window start / end |

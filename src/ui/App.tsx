@@ -2,6 +2,8 @@ import chalk from 'chalk';
 import { Box, Text, useApp, useInput, useStdin, useStdout } from 'ink';
 import { useEffect, useState } from 'react';
 import { renderChart } from '../chart.js';
+import { fromHosts, insertHosts, UNKNOWN_DATE, type DatasetStore } from '../datasets.js';
+import { addDays } from '../dates.js';
 import { fmtTime, fmtValue } from '../format.js';
 import type { HostData, Metric } from '../model.js';
 import { initialView, moveCursor, resetZoom, zoomIn, zoomOut, type View } from '../viewport.js';
@@ -104,6 +106,7 @@ const KEYBINDINGS: [string, string][] = [
   ['←/→  h/l', 'move time cursor'],
   ['H/L', 'move cursor fast'],
   ['Tab  [ ]', 'switch instance (CPU/NIC/disk)'],
+  ['< / >  , .', 'previous / next day'],
   ['+ / -', 'zoom in / out around cursor'],
   ['0', 'reset zoom'],
   ['g / G', 'jump to window start / end'],
@@ -125,19 +128,37 @@ function HelpOverlay() {
   );
 }
 
-export function App({ hosts }: { hosts: HostData[] }) {
+export interface AppProps {
+  hosts: HostData[];
+  /** 端の日付を越えて移動しようとしたとき、その日のデータを取得する（--host等） */
+  loadDate?: (date: string) => Promise<HostData[]>;
+}
+
+export function App({ hosts: initialHosts, loadDate }: AppProps) {
   const { exit } = useApp();
   const { isRawModeSupported } = useStdin();
   const { cols, rows } = useTermSize();
 
+  const [store, setStore] = useState<DatasetStore>(() => fromHosts(initialHosts));
+  const [currentDate, setCurrentDate] = useState(() => store.dates[store.dates.length - 1]);
   const [hostIdx, setHostIdx] = useState(0);
-  const host = hosts[hostIdx];
-  const n = host.timeLabels.length;
-
   const [metricIdx, setMetricIdx] = useState(0);
-  const [view, setView] = useState<View>(() => initialView(n));
   const [instanceSel, setInstanceSel] = useState<Record<string, number>>({});
   const [help, setHelp] = useState(false);
+  const [loading, setLoading] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  const dates = store.dates;
+  const dateIdx = Math.max(0, dates.indexOf(currentDate));
+  const hostsForDate = store.byDate[dates[dateIdx]] ?? initialHosts;
+  const host = hostsForDate[Math.min(hostIdx, hostsForDate.length - 1)];
+  const n = host.timeLabels.length;
+
+  const [view, setView] = useState<View>(() => initialView(n));
+  // 日付・ホストが変わるとサンプル数も変わるのでビューを初期化する
+  useEffect(() => {
+    setView(initialView(n));
+  }, [host]);
 
   const metric = host.metrics[Math.min(metricIdx, host.metrics.length - 1)];
   const instanceIdx = Math.min(instanceSel[metric.id] ?? 0, metric.instances.length - 1);
@@ -150,6 +171,35 @@ export function App({ hosts }: { hosts: HostData[] }) {
     setInstanceSel((sel) => ({ ...sel, [metric.id]: (instanceIdx + dir + count) % count }));
   };
 
+  const gotoDate = (dir: -1 | 1) => {
+    const target = dateIdx + dir;
+    if (target >= 0 && target < dates.length) {
+      setCurrentDate(dates[target]);
+      return;
+    }
+    if (!loadDate) {
+      if (dates.length === 1) {
+        setNotice('one day loaded — pass multiple files or use --host to browse days');
+      }
+      return;
+    }
+    if (loading) return;
+    const cur = dates[dateIdx];
+    const targetDate = cur === UNKNOWN_DATE ? undefined : addDays(cur, dir);
+    if (!targetDate) {
+      setNotice('cannot compute adjacent date (input has no file-date)');
+      return;
+    }
+    setLoading(targetDate);
+    loadDate(targetDate)
+      .then((newHosts) => {
+        setStore((s) => insertHosts(s, newHosts));
+        setCurrentDate(newHosts[0]?.fileDate ?? targetDate);
+      })
+      .catch((e) => setNotice(`${targetDate}: ${e instanceof Error ? e.message : String(e)}`))
+      .finally(() => setLoading(null));
+  };
+
   // 高速連打時は Ink が複数キーを1チャンク（例: "jjj"）で渡すため1文字ずつ処理する
   useInput(
     (chunk, key) => {
@@ -159,26 +209,27 @@ export function App({ hosts }: { hosts: HostData[] }) {
   );
 
   function handleKey(input: string, key: Parameters<Parameters<typeof useInput>[0]>[1]) {
-      if (input === 'q') return exit();
-      if (input === '?') return setHelp((h) => !h);
-      if (key.downArrow || input === 'j') return setMetricIdx((i) => Math.min(host.metrics.length - 1, i + 1));
-      if (key.upArrow || input === 'k') return setMetricIdx((i) => Math.max(0, i - 1));
-      if (key.leftArrow || input === 'h') return setView((v) => moveCursor(v, key.shift ? -bigStep : -1, n));
-      if (key.rightArrow || input === 'l') return setView((v) => moveCursor(v, key.shift ? bigStep : 1, n));
-      if (input === 'H') return setView((v) => moveCursor(v, -bigStep, n));
-      if (input === 'L') return setView((v) => moveCursor(v, bigStep, n));
-      if ((key.tab && !key.shift) || input === ']') return cycleInstance(1);
-      if ((key.tab && key.shift) || input === '[') return cycleInstance(-1);
-      if (input === '+' || input === '=') return setView((v) => zoomIn(v, n));
-      if (input === '-') return setView((v) => zoomOut(v, n));
-      if (input === '0') return setView((v) => resetZoom(v, n));
-      if (input === 'g') return setView((v) => ({ ...v, cursor: v.start }));
-      if (input === 'G') return setView((v) => ({ ...v, cursor: v.end }));
-      if (input === 'n' && hosts.length > 1) {
-        const next = (hostIdx + 1) % hosts.length;
-        setHostIdx(next);
-        setView(initialView(hosts[next].timeLabels.length));
-      }
+    if (notice) setNotice(null);
+    if (input === 'q') return exit();
+    if (input === '?') return setHelp((h) => !h);
+    if (key.downArrow || input === 'j') return setMetricIdx((i) => Math.min(host.metrics.length - 1, i + 1));
+    if (key.upArrow || input === 'k') return setMetricIdx((i) => Math.max(0, i - 1));
+    if (key.leftArrow || input === 'h') return setView((v) => moveCursor(v, key.shift ? -bigStep : -1, n));
+    if (key.rightArrow || input === 'l') return setView((v) => moveCursor(v, key.shift ? bigStep : 1, n));
+    if (input === 'H') return setView((v) => moveCursor(v, -bigStep, n));
+    if (input === 'L') return setView((v) => moveCursor(v, bigStep, n));
+    if ((key.tab && !key.shift) || input === ']') return cycleInstance(1);
+    if ((key.tab && key.shift) || input === '[') return cycleInstance(-1);
+    if (input === ',' || input === '<') return gotoDate(-1);
+    if (input === '.' || input === '>') return gotoDate(1);
+    if (input === '+' || input === '=') return setView((v) => zoomIn(v, n));
+    if (input === '-') return setView((v) => zoomOut(v, n));
+    if (input === '0') return setView((v) => resetZoom(v, n));
+    if (input === 'g') return setView((v) => ({ ...v, cursor: v.start }));
+    if (input === 'G') return setView((v) => ({ ...v, cursor: v.end }));
+    if (input === 'n' && hostsForDate.length > 1) {
+      setHostIdx((i) => (i + 1) % hostsForDate.length);
+    }
   }
 
   const chartW = Math.max(10, cols - SIDEBAR_W - YLABEL_W - 3);
@@ -189,10 +240,14 @@ export function App({ hosts }: { hosts: HostData[] }) {
     host.sysname && host.release ? `${host.sysname} ${host.release}` : host.sysname,
     host.machine,
     host.cpuCount !== undefined ? `${host.cpuCount} CPU` : undefined,
-    host.fileDate,
   ]
     .filter(Boolean)
     .join(' · ');
+
+  const dateInfo =
+    dates[dateIdx] === UNKNOWN_DATE
+      ? undefined
+      : `${dates[dateIdx]}${dates.length > 1 || loadDate ? ` (${dateIdx + 1}/${dates.length})` : ''}`;
 
   return (
     <Box flexDirection="column">
@@ -201,10 +256,15 @@ export function App({ hosts }: { hosts: HostData[] }) {
           sadf-view{' '}
         </Text>
         <Text bold>{host.nodename}</Text>
-        {hosts.length > 1 && <Text dimColor> ({hostIdx + 1}/{hosts.length})</Text>}
+        {hostsForDate.length > 1 && (
+          <Text dimColor>
+            {' '}
+            ({hostIdx + 1}/{hostsForDate.length})
+          </Text>
+        )}
         <Text dimColor>
           {' '}
-          {hostInfo} · {n} samples
+          {[hostInfo, dateInfo, `${n} samples`].filter(Boolean).join(' · ')}
           {zoomed ? ` · zoom ${fmtTime(host.timeLabels[view.start])}–${fmtTime(host.timeLabels[view.end])}` : ''}
         </Text>
       </Box>
@@ -230,7 +290,13 @@ export function App({ hosts }: { hosts: HostData[] }) {
           />
         )}
       </Box>
-      <Text dimColor>↑↓ metric · ←→ cursor · Tab instance · +/- zoom · 0 reset · ? help · q quit</Text>
+      {loading ? (
+        <Text color="yellow">⏳ loading {loading}…</Text>
+      ) : notice ? (
+        <Text color="yellow">{notice}</Text>
+      ) : (
+        <Text dimColor>↑↓ metric · ←→ cursor · Tab inst · &lt;&gt; day · +/- zoom · 0 reset · ? help · q quit</Text>
+      )}
     </Box>
   );
 }
