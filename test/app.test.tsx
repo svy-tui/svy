@@ -123,4 +123,37 @@ describe('日付切り替え', () => {
     expect(lastFrame()).toContain('--host');
     unmount();
   });
+
+  it('日付キーが1チャンクで連打されても全て効く', async () => {
+    const threeDays = [...hosts, ...onDate('2026-07-06'), ...onDate('2026-07-07')];
+    const { lastFrame, stdin, unmount } = render(<App hosts={threeDays} />);
+    expect(lastFrame()).toContain('2026-07-07 (3/3)');
+    stdin.write(',,');
+    await tick();
+    expect(lastFrame()).toContain('2026-07-05 (1/3)');
+    unmount();
+  });
+
+  it('インスタンスキーが1チャンクで連打されても全て効く', async () => {
+    // CPU は all / cpu0 / cpu1 の3インスタンス
+    const { lastFrame, stdin, unmount } = render(<App hosts={hosts} />);
+    stdin.write(']]');
+    await tick();
+    expect(lastFrame()).toContain('cpu1 (3/3)');
+    unmount();
+  });
+
+  it('取得中に日付キーを連打しても多重フェッチしない', async () => {
+    let resolve!: (h: ReturnType<typeof onDate>) => void;
+    const loader = vi.fn(() => new Promise<ReturnType<typeof onDate>>((r) => (resolve = r)));
+    const { lastFrame, stdin, unmount } = render(<App hosts={hosts} loadDate={loader} />);
+    stdin.write(',,,');
+    await tick();
+    expect(loader).toHaveBeenCalledTimes(1);
+    resolve(onDate('2026-07-04'));
+    await tick();
+    await tick();
+    expect(lastFrame()).toContain('2026-07-04 (1/2)');
+    unmount();
+  });
 });

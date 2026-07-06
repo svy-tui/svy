@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import { Box, Text, useApp, useInput, useStdin, useStdout } from 'ink';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { renderChart } from '../chart.js';
 import { fromHosts, insertHosts, UNKNOWN_DATE, type DatasetStore } from '../datasets.js';
 import { addDays } from '../dates.js';
@@ -148,6 +148,15 @@ export function App({ hosts: initialHosts, loadDate }: AppProps) {
   const [loading, setLoading] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
+  // キー連打は1チャンクで届き再レンダー前に複数回処理されるため、
+  // 日付移動とロード中判定は state のクロージャではなく ref を正とする
+  const dateRef = useRef(currentDate);
+  const loadingRef = useRef<string | null>(null);
+  const setDate = (d: string) => {
+    dateRef.current = d;
+    setCurrentDate(d);
+  };
+
   const dates = store.dates;
   const dateIdx = Math.max(0, dates.indexOf(currentDate));
   const hostsForDate = store.byDate[dates[dateIdx]] ?? initialHosts;
@@ -168,13 +177,17 @@ export function App({ hosts: initialHosts, loadDate }: AppProps) {
   const cycleInstance = (dir: number) => {
     const count = metric.instances.length;
     if (count < 2) return;
-    setInstanceSel((sel) => ({ ...sel, [metric.id]: (instanceIdx + dir + count) % count }));
+    setInstanceSel((sel) => {
+      const cur = Math.min(sel[metric.id] ?? 0, count - 1);
+      return { ...sel, [metric.id]: (cur + dir + count) % count };
+    });
   };
 
   const gotoDate = (dir: -1 | 1) => {
-    const target = dateIdx + dir;
+    const curIdx = Math.max(0, dates.indexOf(dateRef.current));
+    const target = curIdx + dir;
     if (target >= 0 && target < dates.length) {
-      setCurrentDate(dates[target]);
+      setDate(dates[target]);
       return;
     }
     if (!loadDate) {
@@ -183,21 +196,25 @@ export function App({ hosts: initialHosts, loadDate }: AppProps) {
       }
       return;
     }
-    if (loading) return;
-    const cur = dates[dateIdx];
+    if (loadingRef.current) return;
+    const cur = dates[curIdx];
     const targetDate = cur === UNKNOWN_DATE ? undefined : addDays(cur, dir);
     if (!targetDate) {
       setNotice('cannot compute adjacent date (input has no file-date)');
       return;
     }
+    loadingRef.current = targetDate;
     setLoading(targetDate);
     loadDate(targetDate)
       .then((newHosts) => {
         setStore((s) => insertHosts(s, newHosts));
-        setCurrentDate(newHosts[0]?.fileDate ?? targetDate);
+        setDate(newHosts[0]?.fileDate ?? targetDate);
       })
       .catch((e) => setNotice(`${targetDate}: ${e instanceof Error ? e.message : String(e)}`))
-      .finally(() => setLoading(null));
+      .finally(() => {
+        loadingRef.current = null;
+        setLoading(null);
+      });
   };
 
   // 高速連打時は Ink が複数キーを1チャンク（例: "jjj"）で渡すため1文字ずつ処理する
