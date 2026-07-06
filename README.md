@@ -163,6 +163,10 @@ npm run build   # tsc → dist/
 node dist/cli.js --demo
 ```
 
+To regenerate the README screenshots (`assets/shot-*.png`), run
+`./scripts/shots.sh` — see the header of that script for prerequisites
+(tmux, aha, Google Chrome, Cascadia Code font).
+
 The chart renderer is a hand-rolled braille canvas (no chart library), the
 sadf JSON parser absorbs field-name differences between sysstat versions
 declaratively, and all navigation logic is pure functions with tests.

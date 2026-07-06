@@ -1,9 +1,22 @@
 #!/usr/bin/env bash
-# README用スクリーンショット生成
-# tmux上で --demo を操作 → ANSIキャプチャ → aha でHTML化 → ヘッドレスChromeでPNG化。
-# コードブロック貼り付けではGitHub上で色が出ない（ANSI非対応）ため画像にする。
-# braille を塗りつぶしドットで描けるフォントが必要:
-#   brew install aha && brew install --cask font-cascadia-code
+# README用スクリーンショット生成（assets/shot-*.png を上書き）
+#
+# 仕組み: tmux上で --demo を操作 → ANSIキャプチャ(capture-pane -e)
+#         → aha でHTML化 → ヘッドレスChromeでPNG化。
+# GitHubのコードブロックはANSIカラーを描画できないため画像にしている。
+#
+# 前提（macOS）:
+#   - npm run build 済みであること（node dist/cli.js を起動する）
+#   - tmux
+#   - aha                  … brew install aha
+#   - Google Chrome        … /Applications に通常インストール
+#   - Cascadia Code フォント … brew install --cask font-cascadia-code
+#     （braille U+2800 を「塗りつぶしドットのみ」で描ける数少ないフォント。
+#       JetBrains Mono はグリフ無し=豆腐、Apple Braille / DejaVu は
+#       未設定ドットも薄く描くため点線調になり見た目が崩れる）
+#
+# 使い方: ./scripts/shots.sh
+# デモデータはシード固定なので、UIを変えない限り同じ絵が再現される。
 set -euo pipefail
 
 CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"

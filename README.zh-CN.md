@@ -154,6 +154,9 @@ npm run build   # tsc → dist/
 node dist/cli.js --demo
 ```
 
+README 的截图（`assets/shot-*.png`）可以用 `./scripts/shots.sh` 重新生成，
+前置工具（tmux、aha、Google Chrome、Cascadia Code 字体）见脚本开头的注释。
+
 图表渲染器是手写的盲文点阵画布（不依赖图表库），sadf JSON 解析器以声明式方式
 吸收 sysstat 各版本间字段名的差异，所有导航逻辑都是带测试的纯函数。
 

@@ -161,6 +161,10 @@ npm run build   # tsc → dist/
 node dist/cli.js --demo
 ```
 
+README のスクリーンショット（`assets/shot-*.png`）は `./scripts/shots.sh` で
+再生成できます。前提ツール（tmux・aha・Google Chrome・Cascadia Code フォント）は
+スクリプト冒頭のコメントを参照してください。
+
 チャート描画はチャートライブラリに依存しない自前の braille キャンバス、
 sadf JSON パーサは sysstat バージョン間のフィールド名の揺れを宣言的に吸収、
 ナビゲーションのロジックはすべてテスト付きの純粋関数です。
