@@ -43,6 +43,9 @@ svy demo-host Linux 6.8.0-demo · x86_64 · 8 CPU · 2026-07-05 · 1440 samples
 npx @svy-tui/svy --demo
 ```
 
+The demo is browsable across days too — press `<` to travel back in time
+(past days are synthesized on the fly).
+
 > Not on npm yet? Install [from source](#install) and run `svy --demo`.
 
 ## Usage

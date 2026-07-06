@@ -4,8 +4,8 @@ import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import tty from 'node:tty';
 import { render } from 'ink';
-import { daysBetween, todayISO } from './dates.js';
-import { generateDemoJson } from './demo.js';
+import { addDays, daysBetween, todayISO } from './dates.js';
+import { DEMO_BASE_DATE, loadDemoDay } from './demo.js';
 import type { HostData } from './model.js';
 import { parseSadfJson } from './parse.js';
 import { App } from './ui/App.js';
@@ -19,7 +19,7 @@ Usage:
   svy --demo                   explore with synthetic demo data
 
 Options:
-  --demo          generate 24h of synthetic data (no sysstat required)
+  --demo          synthetic data, browsable across days (no sysstat required)
   --host <host>   ssh host; runs \`sadf -j [file] -- -A\` remotely.
                   < / > keys then fetch adjacent days on demand (sadf -j -N)
   -h, --help      show this help
@@ -125,7 +125,14 @@ interface Loaded {
 }
 
 async function loadInput(args: Args): Promise<Loaded> {
-  if (args.demo) return { hosts: parseSadfJson(generateDemoJson()) };
+  if (args.demo) {
+    // 初期2日分 + 過去日はその場で合成（日付切替を --demo でも体験できるように）
+    const yesterday = addDays(DEMO_BASE_DATE, -1)!;
+    return {
+      hosts: [...loadDemoDay(yesterday), ...loadDemoDay(DEMO_BASE_DATE)],
+      loadDate: async (date) => loadDemoDay(date),
+    };
+  }
   if (args.host) {
     const file = args.files[0];
     const remoteCmd = file ? `sadf -j ${file} -- -A` : 'sadf -j -- -A';

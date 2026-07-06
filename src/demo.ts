@@ -2,6 +2,9 @@
 // sysstat が無い環境（macOS/Windows）でも即座に試せるようにするためのもの。
 // シード固定の PRNG で毎回同じデータになる（テスト・GIF撮影の再現性のため）。
 
+import type { HostData } from './model.js';
+import { parseSadfJson } from './parse.js';
+
 function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
   return () => {
@@ -21,9 +24,26 @@ const pad = (n: number) => String(n).padStart(2, '0');
 const bump = (frac: number, mu: number, sigma: number) =>
   Math.exp(-((frac - mu) ** 2) / (2 * sigma ** 2));
 
-export function generateDemoJson(samples = 1440, intervalSec = 60): string {
-  const rnd = mulberry32(42);
-  const date = '2026-07-05';
+/** デモの「今日」。これより過去の日は loadDemoDay がいくらでも合成する */
+export const DEMO_BASE_DATE = '2026-07-05';
+
+/** 日付ごとに異なる決定的なシード */
+const demoSeed = (date: string) => Number(date.replace(/-/g, '')) % 2147483647;
+
+export function loadDemoDay(date: string): HostData[] {
+  if (date > DEMO_BASE_DATE) {
+    throw new Error(`demo has no data after ${DEMO_BASE_DATE}`);
+  }
+  return parseSadfJson(generateDemoJson(1440, 60, date, demoSeed(date)));
+}
+
+export function generateDemoJson(
+  samples = 1440,
+  intervalSec = 60,
+  date = '2026-07-05',
+  seed = 42,
+): string {
+  const rnd = mulberry32(seed);
   const statistics: unknown[] = [];
   let load1 = 0.3;
   let load5 = 0.3;
