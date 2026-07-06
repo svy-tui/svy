@@ -11,6 +11,13 @@
   <a href="README.md">English</a> | <a href="README.ja.md">日本語</a> | 简体中文
 </p>
 
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/@svy-tui/svy"><img src="https://img.shields.io/npm/v/@svy-tui/svy?color=cb3837&logo=npm" alt="npm version"></a>
+  <img src="https://img.shields.io/node/v/@svy-tui/svy" alt="node version">
+  <img src="https://img.shields.io/npm/l/@svy-tui/svy" alt="license">
+</p>
+
 ---
 
 每台 Linux 服务器上，`sar` 都在默默积累着宝贵的性能历史数据。但要「看」这些数据，
@@ -32,8 +39,6 @@ npx @svy-tui/svy --demo
 ```
 
 演示数据包含多天内容——按 `<` 即可回到过去（历史日期会即时合成）。
-
-> 还没发布到 npm？请[从源码安装](#安装)后运行 `svy --demo`。
 
 ## 特性
 
