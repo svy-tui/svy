@@ -3,25 +3,23 @@
 </p>
 
 <p align="center">
-  <b>s</b>ystem <b>v</b>iewer for sar — interactive terminal charts for sysstat historical data.<br>
-  Like btop, but for the past.
+  <b>s</b>ystem <b>v</b>iewer for sar — 在终端里交互式浏览 sysstat 历史数据的图表工具。<br>
+  可以说是「面向过去的 btop」。
 </p>
 
 <p align="center">
-  English | <a href="README.ja.md">日本語</a> | <a href="README.zh-CN.md">简体中文</a>
+  <a href="README.md">English</a> | <a href="README.ja.md">日本語</a> | 简体中文
 </p>
 
 ---
 
-`sar` quietly collects a goldmine of performance history on every Linux server.
-But *looking* at it means squinting at text tables, or generating SVG files with
-`sadf -g` and shuffling them to your desktop. Every incident review starts with
-the same chore.
+每台 Linux 服务器上，`sar` 都在默默积累着宝贵的性能历史数据。但要「看」这些数据，
+要么盯着纯文本表格，要么用 `sadf -g` 生成 SVG 文件再拷贝到本地。每次故障复盘都
+从同样的杂务开始。
 
-**svy** turns that data into an interactive TUI: scrub through time, zoom into
-an incident window, flip between days, and switch across CPU / memory / network
-/ disk — right in the terminal where the data lives. No files generated, no GUI,
-no agent to install on servers.
+**svy** 把这些数据变成交互式 TUI：在时间轴上滑动光标、放大故障时段、跨天翻阅、
+在 CPU / 内存 / 网络 / 磁盘之间切换——一切都在数据所在的终端里完成。不生成任何
+文件，不需要 GUI，也不用在服务器上安装任何 agent。
 
 ```
 svy demo-host Linux 6.8.0-demo · x86_64 · 8 CPU · 2026-07-05 (2/2) · 1440 samples
@@ -49,37 +47,34 @@ svy demo-host Linux 6.8.0-demo · x86_64 · 8 CPU · 2026-07-05 (2/2) · 1440 sa
 ↑↓ metric · ←→ cursor · Tab inst · <> day · +/- zoom · 0 reset · ? help · q quit
 ```
 
-*(actual terminal output of `svy --demo` — charts are colored in a real terminal)*
+*（`svy --demo` 的真实终端输出，在真实终端中图表带有颜色）*
 
-## Try it in 10 seconds (no sysstat required)
+## 10 秒上手（无需 sysstat）
 
 ```sh
 npx @svy-tui/svy --demo
 ```
 
-The demo ships with multiple days of synthetic data — press `<` to travel back
-in time; past days are synthesized on the fly.
+演示数据包含多天内容——按 `<` 即可回到过去（历史日期会即时合成）。
 
-> Not on npm yet? Install [from source](#install) and run `svy --demo`.
+> 还没发布到 npm？请[从源码安装](#安装)后运行 `svy --demo`。
 
-## Features
+## 特性
 
-- **8 metric groups** — CPU (per-core), memory, load average, network (per NIC),
-  disk I/O (per device), disk utilization, IO tps, paging
-- **Time cursor & zoom** — scrub with `←`/`→`, zoom into an incident window with
-  `+`, read exact values at the cursor
-- **Day browsing** — flip through sar's daily files with `<`/`>`; with `--host`,
-  adjacent days are fetched over ssh on demand
-- **Instance switching** — cycle per-CPU cores, NICs, and disk devices with `Tab`
-- **Remote-first** — view a server's history from your laptop; sysstat is only
-  needed where the data was recorded
-- **Zero artifacts** — reads JSON from a pipe, draws braille charts, writes
-  nothing to disk
+- **8 组指标** — CPU（按核心）、内存、平均负载、网络（按网卡）、
+  磁盘 I/O（按设备）、磁盘利用率、IO tps、分页
+- **时间光标与缩放** — 用 `←`/`→` 滑动，用 `+` 以光标为中心放大，
+  图例实时显示光标处的精确数值
+- **跨天浏览** — 用 `<`/`>` 翻阅 sar 的每日文件；配合 `--host` 时，
+  相邻日期会通过 ssh 按需拉取
+- **实例切换** — 用 `Tab` 在 CPU 核心、网卡、磁盘设备之间循环
+- **远程优先** — 在笔记本上查看服务器的历史数据；只有产生数据的机器才需要 sysstat
+- **零文件残留** — 从管道读取 JSON，用盲文点阵画图，不向磁盘写任何东西
 
-## Tour
+## 界面一览
 
-**Network view** — two colored series (rx/tx) per interface, `Tab` switches NICs,
-the y-axis scales units automatically:
+**网络视图** — 每个网卡显示 rx/tx 两条彩色曲线，`Tab` 切换网卡，
+纵轴单位自动进位：
 
 ```
 svy demo-host Linux 6.8.0-demo · x86_64 · 8 CPU · 2026-07-05 (2/2) · 1440 samples
@@ -106,8 +101,8 @@ svy demo-host Linux 6.8.0-demo · x86_64 · 8 CPU · 2026-07-05 (2/2) · 1440 sa
                         ● rx 116 kB/s  ● tx 41 kB/s  ┃ 23:59:00
 ```
 
-**Zoom into an incident** — `+` narrows the window around the cursor; the header
-shows the zoomed range. That evening spike is suddenly obvious:
+**放大故障时段** — 按 `+` 以光标为中心收窄窗口，标题栏显示缩放范围。
+傍晚的流量尖峰一目了然：
 
 ```
 svy demo-host Linux 6.8.0-demo · x86_64 · 8 CPU · 2026-07-05 (2/2) · 1440 samples · zoom 18:00–23:59
@@ -134,7 +129,7 @@ svy demo-host Linux 6.8.0-demo · x86_64 · 8 CPU · 2026-07-05 (2/2) · 1440 sa
                         ● rx 165 kB/s  ● tx 58 kB/s  ┃ 23:54:00
 ```
 
-**Help** — `?` shows every keybinding without leaving the app:
+**帮助** — 按 `?` 无需离开应用即可查看所有快捷键：
 
 ```
   CPU            Keybindings
@@ -151,85 +146,81 @@ svy demo-host Linux 6.8.0-demo · x86_64 · 8 CPU · 2026-07-05 (2/2) · 1440 sa
                  q            quit
 ```
 
-## Usage
+## 用法
 
 ```sh
-# On a Linux server: today's data, all activities
+# 在 Linux 服务器上：查看今天的全部活动数据
 sadf -j -- -A | svy
 
-# A specific day
+# 查看某一天
 sadf -j /var/log/sysstat/sa05 -- -A | svy
 
-# From your laptop (macOS/Windows), viewing a remote server
+# 在笔记本（macOS/Windows）上查看远程服务器
 ssh web01 'sadf -j -- -A' | svy
-svy --host web01                      # same thing, shorthand
+svy --host web01                      # 等价的简写
 svy --host web01 /var/log/sysstat/sa05
 
-# From saved files — pass several days and flip through them with < / >
+# 从保存的文件查看 — 传入多天的文件，用 < / > 翻阅
 sadf -j -- -A > today.json
 sadf -j -1 -- -A > yesterday.json
 svy today.json yesterday.json
 ```
 
-### Browsing across days
+### 跨天浏览
 
-sar keeps one data file per day. With `--host`, pressing `<` / `>` past the
-edge of the loaded data fetches the adjacent day on demand (running
-`sadf -j -N -- -A` remotely, so it works regardless of where the distro stores
-its `saDD` files). With local files, every file you pass becomes a day you can
-flip through.
+sar 每天保存一个数据文件。使用 `--host` 时，在已加载数据的边缘继续按
+`<` / `>` 会按需拉取相邻日期（远程执行 `sadf -j -N -- -A`，因此不受各发行版
+`saDD` 文件存放路径差异的影响）。使用本地文件时，传入的每个文件都是可以
+翻阅的一天。
 
-> **Windows note:** piping (`… | svy`) disables keyboard input because there is
-> no `/dev/tty` to reopen. Use a file argument or `--host` instead.
+> **Windows 注意事项：** 使用管道（`… | svy`）时因为无法重新打开 `/dev/tty`，
+> 键盘输入会被禁用。请改用文件参数或 `--host`。
 
-## Keys
+## 快捷键
 
-| Key | Action |
+| 按键 | 动作 |
 |---|---|
-| `↑`/`↓` or `k`/`j` | select metric |
-| `←`/`→` or `h`/`l` | move time cursor (`H`/`L` for big steps) |
-| `Tab` / `[` `]` | switch instance (per-CPU, NIC, disk device) |
-| `<` / `>` or `,` `.` | previous / next day |
-| `+` / `-` | zoom in / out around the cursor |
-| `0` | reset zoom |
-| `g` / `G` | jump to window start / end |
-| `n` | next host (multi-host JSON) |
-| `?` | help |
-| `q` | quit |
+| `↑`/`↓` 或 `k`/`j` | 选择指标 |
+| `←`/`→` 或 `h`/`l` | 移动时间光标（`H`/`L` 大步移动） |
+| `Tab` / `[` `]` | 切换实例（CPU 核心、网卡、磁盘设备） |
+| `<` / `>` 或 `,` `.` | 前一天 / 后一天 |
+| `+` / `-` | 以光标为中心放大 / 缩小 |
+| `0` | 重置缩放 |
+| `g` / `G` | 跳到窗口开头 / 结尾 |
+| `n` | 下一台主机（多主机 JSON 时） |
+| `?` | 帮助 |
+| `q` | 退出 |
 
-## How it works
+## 工作原理
 
-svy's only input contract is the JSON emitted by **`sadf -j`** (part of
-sysstat). It never parses binary `sa` files itself, which makes it immune to
-sysstat version and architecture differences — the parsing burden stays with
-sysstat, where it belongs.
+svy 唯一的输入契约是 **`sadf -j`**（sysstat 自带）输出的 JSON。它从不自行解析
+二进制 `sa` 文件，因此不受 sysstat 版本和架构差异的影响——解析的责任留在
+它本来的归属：sysstat 那边。
 
-That contract also defines the roles: sysstat **collects** on the server, svy
-**views** anywhere Node.js ≥ 18.18 runs (Linux, macOS, Windows Terminal). Your
-laptop never needs sysstat installed.
+这个契约也划定了角色分工：sysstat 在服务器上**采集**，svy 在任何能运行
+Node.js ≥ 18.18 的地方**查看**（Linux / macOS / Windows Terminal）。
+你的笔记本不需要安装 sysstat。
 
-Metrics missing from the input are simply not shown; extra activities are
-ignored. Multi-host JSON (e.g. concatenated from a fleet) works — cycle hosts
-with `n`.
+输入中缺失的指标不会显示；多主机 JSON 也能正常工作，用 `n` 切换主机。
 
-## Alternatives
+## 与同类工具对比
 
-| | interactive | historical sar data | file-less | remote from laptop |
+| | 交互性 | sar 历史数据 | 无文件残留 | 笔记本远程查看 |
 |---|---|---|---|---|
-| **svy** | TUI | ✓ | ✓ | ✓ (ssh / `--host`) |
-| `sar` text output | – | ✓ | ✓ | via ssh, tables only |
-| `sadf -g` (SVG) | static images | ✓ | generates files | copy files around |
-| kSar | Java GUI | ✓ | – | needs export/X11 |
-| atop -r | TUI | own log format only | ✓ | – |
-| btop / htop | TUI | live only | ✓ | – |
+| **svy** | TUI | ✓ | ✓ | ✓（ssh / `--host`） |
+| `sar` 文本输出 | – | ✓ | ✓ | 经 ssh，仅表格 |
+| `sadf -g`（SVG） | 静态图片 | ✓ | 生成文件 | 需来回拷贝文件 |
+| kSar | Java GUI | ✓ | – | 需导出/X11 |
+| atop -r | TUI | 仅自有格式 | ✓ | – |
+| btop / htop | TUI | 仅实时 | ✓ | – |
 
-## Install
+## 安装
 
 ```sh
-npm install -g @svy-tui/svy    # installs the `svy` command
+npm install -g @svy-tui/svy    # 安装后命令为 `svy`
 ```
 
-From source (requires Node.js ≥ 18.18):
+从源码安装（需要 Node.js ≥ 18.18）：
 
 ```sh
 git clone https://github.com/svy-tui/svy && cd svy
@@ -237,19 +228,18 @@ npm install && npm run build && npm link
 svy --demo
 ```
 
-## Development
+## 开发
 
 ```sh
 npm install
-npm test        # vitest — parser, chart renderer, viewport, UI interaction
+npm test        # vitest — 解析器、图表渲染、视口、UI 交互
 npm run build   # tsc → dist/
 node dist/cli.js --demo
 ```
 
-The chart renderer is a hand-rolled braille canvas (no chart library), the
-sadf JSON parser absorbs field-name differences between sysstat versions
-declaratively, and all navigation logic is pure functions with tests.
+图表渲染器是手写的盲文点阵画布（不依赖图表库），sadf JSON 解析器以声明式方式
+吸收 sysstat 各版本间字段名的差异，所有导航逻辑都是带测试的纯函数。
 
-## License
+## 许可证
 
 [MIT](LICENSE)

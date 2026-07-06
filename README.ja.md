@@ -3,25 +3,24 @@
 </p>
 
 <p align="center">
-  <b>s</b>ystem <b>v</b>iewer for sar — interactive terminal charts for sysstat historical data.<br>
-  Like btop, but for the past.
+  <b>s</b>ystem <b>v</b>iewer for sar — sysstat の過去データを端末でインタラクティブにグラフ表示。<br>
+  いわば「過去が見える btop」。
 </p>
 
 <p align="center">
-  English | <a href="README.ja.md">日本語</a> | <a href="README.zh-CN.md">简体中文</a>
+  <a href="README.md">English</a> | 日本語 | <a href="README.zh-CN.md">简体中文</a>
 </p>
 
 ---
 
-`sar` quietly collects a goldmine of performance history on every Linux server.
-But *looking* at it means squinting at text tables, or generating SVG files with
-`sadf -g` and shuffling them to your desktop. Every incident review starts with
-the same chore.
+`sar` はどの Linux サーバでも性能履歴という宝の山を黙々と集めています。
+しかしそれを「見る」となると、テキストの表とにらめっこするか、`sadf -g` で
+SVG を生成して手元にコピーして回すか。障害の振り返りのたびに同じ雑用が発生します。
 
-**svy** turns that data into an interactive TUI: scrub through time, zoom into
-an incident window, flip between days, and switch across CPU / memory / network
-/ disk — right in the terminal where the data lives. No files generated, no GUI,
-no agent to install on servers.
+**svy** はそのデータを対話的な TUI に変えます。時間をスクラブし、インシデントの
+時間帯へズームし、日付をまたいで行き来し、CPU / メモリ / ネットワーク / ディスクを
+切り替える——すべてデータがあるその端末の中で完結。ファイル生成なし、GUI 不要、
+サーバへのエージェント導入も不要です。
 
 ```
 svy demo-host Linux 6.8.0-demo · x86_64 · 8 CPU · 2026-07-05 (2/2) · 1440 samples
@@ -49,37 +48,37 @@ svy demo-host Linux 6.8.0-demo · x86_64 · 8 CPU · 2026-07-05 (2/2) · 1440 sa
 ↑↓ metric · ←→ cursor · Tab inst · <> day · +/- zoom · 0 reset · ? help · q quit
 ```
 
-*(actual terminal output of `svy --demo` — charts are colored in a real terminal)*
+*（`svy --demo` の実際の端末出力。実端末ではカラー表示されます）*
 
-## Try it in 10 seconds (no sysstat required)
+## 10秒で試す（sysstat 不要）
 
 ```sh
 npx @svy-tui/svy --demo
 ```
 
-The demo ships with multiple days of synthetic data — press `<` to travel back
-in time; past days are synthesized on the fly.
+デモには複数日分の合成データが入っています。`<` を押すと過去へ遡れます
+（過去日はその場で合成されます）。
 
-> Not on npm yet? Install [from source](#install) and run `svy --demo`.
+> npm 未公開の場合は[ソースからインストール](#インストール)して `svy --demo` を実行してください。
 
-## Features
+## 機能
 
-- **8 metric groups** — CPU (per-core), memory, load average, network (per NIC),
-  disk I/O (per device), disk utilization, IO tps, paging
-- **Time cursor & zoom** — scrub with `←`/`→`, zoom into an incident window with
-  `+`, read exact values at the cursor
-- **Day browsing** — flip through sar's daily files with `<`/`>`; with `--host`,
-  adjacent days are fetched over ssh on demand
-- **Instance switching** — cycle per-CPU cores, NICs, and disk devices with `Tab`
-- **Remote-first** — view a server's history from your laptop; sysstat is only
-  needed where the data was recorded
-- **Zero artifacts** — reads JSON from a pipe, draws braille charts, writes
-  nothing to disk
+- **8つのメトリクスグループ** — CPU（コア別）・メモリ・ロードアベレージ・
+  ネットワーク（NIC別）・ディスクI/O（デバイス別）・ディスク使用率・IO tps・ページング
+- **タイムカーソルとズーム** — `←`/`→` でスクラブ、`+` でカーソル中心にズームし、
+  カーソル位置の正確な値を凡例で読める
+- **日付ブラウズ** — sar の日次ファイルを `<`/`>` で行き来。`--host` なら隣の日を
+  ssh 越しにオンデマンド取得
+- **インスタンス切替** — `Tab` で CPU コア・NIC・ディスクデバイスを巡回
+- **リモートファースト** — ラップトップからサーバの履歴を閲覧。sysstat が必要なのは
+  データを記録した側だけ
+- **ゴミファイルゼロ** — パイプから JSON を読み、braille でチャートを描き、
+  ディスクには何も書かない
 
-## Tour
+## 画面ツアー
 
-**Network view** — two colored series (rx/tx) per interface, `Tab` switches NICs,
-the y-axis scales units automatically:
+**ネットワークビュー** — インターフェイスごとに rx/tx の2系列を色分け表示。
+`Tab` で NIC を切替、y軸の単位は自動で繰り上がります：
 
 ```
 svy demo-host Linux 6.8.0-demo · x86_64 · 8 CPU · 2026-07-05 (2/2) · 1440 samples
@@ -106,8 +105,8 @@ svy demo-host Linux 6.8.0-demo · x86_64 · 8 CPU · 2026-07-05 (2/2) · 1440 sa
                         ● rx 116 kB/s  ● tx 41 kB/s  ┃ 23:59:00
 ```
 
-**Zoom into an incident** — `+` narrows the window around the cursor; the header
-shows the zoomed range. That evening spike is suddenly obvious:
+**インシデントへズーム** — `+` でカーソル周辺に窓を絞り込み。ヘッダにズーム範囲が
+表示されます。夕方のスパイクが一目瞭然：
 
 ```
 svy demo-host Linux 6.8.0-demo · x86_64 · 8 CPU · 2026-07-05 (2/2) · 1440 samples · zoom 18:00–23:59
@@ -134,7 +133,7 @@ svy demo-host Linux 6.8.0-demo · x86_64 · 8 CPU · 2026-07-05 (2/2) · 1440 sa
                         ● rx 165 kB/s  ● tx 58 kB/s  ┃ 23:54:00
 ```
 
-**Help** — `?` shows every keybinding without leaving the app:
+**ヘルプ** — `?` でアプリを離れずに全キーバインドを確認：
 
 ```
   CPU            Keybindings
@@ -151,85 +150,84 @@ svy demo-host Linux 6.8.0-demo · x86_64 · 8 CPU · 2026-07-05 (2/2) · 1440 sa
                  q            quit
 ```
 
-## Usage
+## 使い方
 
 ```sh
-# On a Linux server: today's data, all activities
+# Linuxサーバ上で: 今日のデータを全アクティビティ込みで
 sadf -j -- -A | svy
 
-# A specific day
+# 特定の日
 sadf -j /var/log/sysstat/sa05 -- -A | svy
 
-# From your laptop (macOS/Windows), viewing a remote server
+# 手元のラップトップ（macOS/Windows）からリモートサーバを見る
 ssh web01 'sadf -j -- -A' | svy
-svy --host web01                      # same thing, shorthand
+svy --host web01                      # 同じことの短縮形
 svy --host web01 /var/log/sysstat/sa05
 
-# From saved files — pass several days and flip through them with < / >
+# 保存済みファイルから — 複数日を渡して < / > で行き来
 sadf -j -- -A > today.json
 sadf -j -1 -- -A > yesterday.json
 svy today.json yesterday.json
 ```
 
-### Browsing across days
+### 日付をまたいで見る
 
-sar keeps one data file per day. With `--host`, pressing `<` / `>` past the
-edge of the loaded data fetches the adjacent day on demand (running
-`sadf -j -N -- -A` remotely, so it works regardless of where the distro stores
-its `saDD` files). With local files, every file you pass becomes a day you can
-flip through.
+sar はデータファイルを1日1つ持ちます。`--host` 使用時に、読み込み済みの端を越えて
+`<` / `>` を押すと、隣の日をオンデマンドで取得します（リモートで
+`sadf -j -N -- -A` を実行するため、ディストリごとの `saDD` ファイルの置き場所の
+違いに影響されません）。ローカルファイルの場合は、渡したファイルがそのまま
+行き来できる日になります。
 
-> **Windows note:** piping (`… | svy`) disables keyboard input because there is
-> no `/dev/tty` to reopen. Use a file argument or `--host` instead.
+> **Windows での注意:** パイプ（`… | svy`）では `/dev/tty` を開き直せないため
+> キー入力が無効になります。ファイル引数か `--host` を使ってください。
 
-## Keys
+## キー操作
 
-| Key | Action |
+| キー | 動作 |
 |---|---|
-| `↑`/`↓` or `k`/`j` | select metric |
-| `←`/`→` or `h`/`l` | move time cursor (`H`/`L` for big steps) |
-| `Tab` / `[` `]` | switch instance (per-CPU, NIC, disk device) |
-| `<` / `>` or `,` `.` | previous / next day |
-| `+` / `-` | zoom in / out around the cursor |
-| `0` | reset zoom |
-| `g` / `G` | jump to window start / end |
-| `n` | next host (multi-host JSON) |
-| `?` | help |
-| `q` | quit |
+| `↑`/`↓` or `k`/`j` | メトリクス選択 |
+| `←`/`→` or `h`/`l` | タイムカーソル移動（`H`/`L` で大きく） |
+| `Tab` / `[` `]` | インスタンス切替（CPUコア・NIC・ディスク） |
+| `<` / `>` or `,` `.` | 前日 / 翌日 |
+| `+` / `-` | カーソル中心にズームイン / アウト |
+| `0` | ズームリセット |
+| `g` / `G` | 窓の先頭 / 末尾へジャンプ |
+| `n` | 次のホスト（マルチホストJSON時） |
+| `?` | ヘルプ |
+| `q` | 終了 |
 
-## How it works
+## 仕組み
 
-svy's only input contract is the JSON emitted by **`sadf -j`** (part of
-sysstat). It never parses binary `sa` files itself, which makes it immune to
-sysstat version and architecture differences — the parsing burden stays with
-sysstat, where it belongs.
+svy の唯一の入力契約は **`sadf -j`**（sysstat 付属）が出力する JSON です。
+バイナリの `sa` ファイルを自前でパースすることは決してありません。そのため
+sysstat のバージョン差やアーキテクチャ差の影響を受けず、パースの責務は
+本来の持ち主である sysstat 側に留まります。
 
-That contract also defines the roles: sysstat **collects** on the server, svy
-**views** anywhere Node.js ≥ 18.18 runs (Linux, macOS, Windows Terminal). Your
-laptop never needs sysstat installed.
+この契約が役割分担も決めます。sysstat はサーバで**収集**し、svy は Node.js ≥ 18.18
+が動く場所ならどこでも**閲覧**します（Linux / macOS / Windows Terminal）。
+手元のマシンに sysstat は不要です。
 
-Metrics missing from the input are simply not shown; extra activities are
-ignored. Multi-host JSON (e.g. concatenated from a fleet) works — cycle hosts
-with `n`.
+入力に無いメトリクスは単に表示されません。マルチホストの JSON にも対応しており、
+`n` でホストを切り替えられます。
 
-## Alternatives
+## 類似ツールとの比較
 
-| | interactive | historical sar data | file-less | remote from laptop |
+| | 対話性 | sar過去データ | ファイル生成なし | ラップトップからリモート閲覧 |
 |---|---|---|---|---|
-| **svy** | TUI | ✓ | ✓ | ✓ (ssh / `--host`) |
-| `sar` text output | – | ✓ | ✓ | via ssh, tables only |
-| `sadf -g` (SVG) | static images | ✓ | generates files | copy files around |
-| kSar | Java GUI | ✓ | – | needs export/X11 |
-| atop -r | TUI | own log format only | ✓ | – |
-| btop / htop | TUI | live only | ✓ | – |
+| **svy** | TUI | ✓ | ✓ | ✓（ssh / `--host`） |
+| `sar` テキスト出力 | – | ✓ | ✓ | ssh経由・表のみ |
+| `sadf -g`（SVG） | 静的画像 | ✓ | ファイル生成あり | ファイルをコピーして回る |
+| kSar | Java GUI | ✓ | – | エクスポート/X11が必要 |
+| atop -r | TUI | 独自フォーマットのみ | ✓ | – |
+| btop / htop | TUI | ライブのみ | ✓ | – |
 
-## Install
+## インストール
 
 ```sh
-npm install -g @svy-tui/svy    # installs the `svy` command
+npm install -g @svy-tui/svy    # `svy` コマンドが入ります
 ```
 
-From source (requires Node.js ≥ 18.18):
+ソースから（Node.js ≥ 18.18 が必要）：
 
 ```sh
 git clone https://github.com/svy-tui/svy && cd svy
@@ -237,19 +235,19 @@ npm install && npm run build && npm link
 svy --demo
 ```
 
-## Development
+## 開発
 
 ```sh
 npm install
-npm test        # vitest — parser, chart renderer, viewport, UI interaction
+npm test        # vitest — パーサ・チャート描画・ビューポート・UI操作
 npm run build   # tsc → dist/
 node dist/cli.js --demo
 ```
 
-The chart renderer is a hand-rolled braille canvas (no chart library), the
-sadf JSON parser absorbs field-name differences between sysstat versions
-declaratively, and all navigation logic is pure functions with tests.
+チャート描画はチャートライブラリに依存しない自前の braille キャンバス、
+sadf JSON パーサは sysstat バージョン間のフィールド名の揺れを宣言的に吸収、
+ナビゲーションのロジックはすべてテスト付きの純粋関数です。
 
-## License
+## ライセンス
 
 [MIT](LICENSE)
