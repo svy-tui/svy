@@ -10,24 +10,40 @@ an incident window, and flip between CPU / memory / network / disk — no files
 generated, no GUI, works over ssh.
 
 ```
-sadf-view demo-host Linux 6.8.0 · x86_64 · 8 CPU · 2026-07-05 · 1440 samples
+sadf-view demo-host Linux 6.8.0-demo · x86_64 · 8 CPU · 2026-07-05 · 1440 samples
 ❯ CPU          CPU [%] — all (1/3)
-  Memory          54.0%┤                                    ⢠⣼⡇
-  Load avg             │                                    ⢸⣿⡇⢀⣿
-  Network              │                                  ⢠⢤⡇⠛⠋⢸⣶⡿⡄
-  Disk I/O             │                              ⢀⡇⢰⠚    ⠈⠉⢧⢀⣀ ⣿⢠⡄
-  Disk util       27.0%┤                           ⣀⡴⣾⡿⠇        ⠈⠛⢸⣿⣤⡼⡇⣶
-  IO tps               │ ⢰⡆     ⢀⡀⢀⣀⣰⠛⠚⠛      ⣀⡼⠛⠛⠁              ⠈⢹⡏⢰⢻ ⠈⡇
-  Paging           0.0%┤⠤⠔⠛⠚⠙⠋⠉⠉⠈⠁⣀⣠⠶⠤⠴⠶⠚⠙⠚⠉⠉⠁                     ⠈⠉⠉⠛⠻⠶⠼⠧⣤
-                       └00:00                                        ┴23:59:00
+  Memory          54.0%┤                                 ⣿ ⣀                                     │
+  Load avg             │                                ⡤⠿⡄⡏⡇⢸⡇                                  │
+  Network              │                                ⡇ ⠙⠃⠷⠋⡇    ⣀                             │
+  Disk I/O             │                               ⡴⠃     ⠉⠓⠚⣇⢠⢿⣀⡟⡆                          │
+  Disk util            │                              ⢰⠃         ⠈⣿ ⠈⠁⣇ ⢠⡄                       │
+  IO tps               │                             ⢀⡏               ⠘⣆⡏⡇                       │
+  Paging               │                            ⣤⢸                 ⠉ ⠓⡆                      │
+                       │                           ⢀⡿⠞                    ⠉⠧⡄                    │
+                  27.0%┤                           ⡞                        ⢹⣿⡀                  │
+                       │                          ⡞⠁                        ⠘⠃⠷⡆                 │
+                       │                        ⣠⠶⠇                            ⠹⠴⡆               │
+                       │                      ⣀⣸⠁        ⣶⡀⣤ ⢀⡀                  ⢹ ⣤⣤            │
+                       │                    ⢀⣠⠇       ⢀⣀⡏⠁⠓⠋⠓⠚⣇⣠⣄ ⢀⣠⣄⣰⡆ ⢀⡀       ⠈⠙⠛⢻            │
+                       │                ⣶⣶⢠⠿⠞      ⢀⡀⢠⣼       ⠉⠉⠈⠉⠛ ⠉ ⠳⣄⡏⣷⡆⣀        ⠘⠋⠳⣄⣀        │
+                       │             ⣀⣠⠤⠟⠋⠉       ⣀⡼⠹⠞                    ⠙⠛⢦⡤⠤⡄        ⠘⠛⣦⣄⣶    │
+                       │⣀⣸⢧⣀⣤⣠⠤⠤⠤⠤⠖⠶⠋⠁        ⣀⡤⠴⠋⠁                            ⠳⠟⢦⣀⣀⣤       ⠈⠛⠹⠞⠳│
+                       │ ⢀⡈⠁       ⣀⣀⣀⣠⣄⡶⠿⠴⠻⠞⠉⠁                                     ⠈⠉⠙⠲⠤⠤⣤⣤⢤⣀⣀⢀⣀│
+                   0.0%┤⠭⠭⠭⠽⠯⠭⠭⠭⠭⠭⠭⠷⠤⠤⠤⠤⠤⠤⠤⢤⡤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠴⠲⠶⠤⠤⠤⠤⠤⠤⠤⠤⣤⠼⠧⠤⠤⢤⡶⠤⣤⠤⠤⠤⠤⠤⠤⠤⠼⢧⡤⠤⠤⠤⠶⠭⠬⠭⢿│
+                       └00:00                                                            ┴23:59:00
                         ● user 7.1%  ● system 2.2%  ● iowait 1.1%  ┃ 23:59:00
+↑↓ metric · ←→ cursor · Tab instance · +/- zoom · 0 reset · ? help · q quit
 ```
+
+*(actual terminal output of `sadf-view --demo`, 100×24 — charts are colored in a real terminal)*
 
 ## Try it in 10 seconds (no sysstat required)
 
 ```sh
 npx sadf-view --demo
 ```
+
+> Not on npm yet? Install [from source](#install) and run `sadf-view --demo`.
 
 ## Usage
 
@@ -83,6 +99,14 @@ not shown.
 
 ```sh
 npm install -g sadf-view
+```
+
+From source (requires Node.js ≥ 18.18):
+
+```sh
+git clone <this repo> && cd sadf-view
+npm install && npm run build && npm link
+sadf-view --demo
 ```
 
 ## Development
