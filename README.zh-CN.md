@@ -21,33 +21,9 @@
 在 CPU / 内存 / 网络 / 磁盘之间切换——一切都在数据所在的终端里完成。不生成任何
 文件，不需要 GUI，也不用在服务器上安装任何 agent。
 
-```
-svy demo-host Linux 6.8.0-demo · x86_64 · 8 CPU · 2026-07-05 (2/2) · 1440 samples
-❯ CPU          CPU [%] — all (1/3)
-  Memory          54.0%┤                                 ⣿ ⣀                                     │
-  Load avg             │                                ⡤⠿⡄⡏⡇⢸⡇                                  │
-  Network              │                                ⡇ ⠙⠃⠷⠋⡇    ⣀                             │
-  Disk I/O             │                               ⡴⠃     ⠉⠓⠚⣇⢠⢿⣀⡟⡆                          │
-  Disk util            │                              ⢰⠃         ⠈⣿ ⠈⠁⣇ ⢠⡄                       │
-  IO tps               │                             ⢀⡏               ⠘⣆⡏⡇                       │
-  Paging               │                            ⣤⢸                 ⠉ ⠓⡆                      │
-                       │                           ⢀⡿⠞                    ⠉⠧⡄                    │
-                  27.0%┤                           ⡞                        ⢹⣿⡀                  │
-                       │                          ⡞⠁                        ⠘⠃⠷⡆                 │
-                       │                        ⣠⠶⠇                            ⠹⠴⡆               │
-                       │                      ⣀⣸⠁        ⣶⡀⣤ ⢀⡀                  ⢹ ⣤⣤            │
-                       │                    ⢀⣠⠇       ⢀⣀⡏⠁⠓⠋⠓⠚⣇⣠⣄ ⢀⣠⣄⣰⡆ ⢀⡀       ⠈⠙⠛⢻            │
-                       │                ⣶⣶⢠⠿⠞      ⢀⡀⢠⣼       ⠉⠉⠈⠉⠛ ⠉ ⠳⣄⡏⣷⡆⣀        ⠘⠋⠳⣄⣀        │
-                       │             ⣀⣠⠤⠟⠋⠉       ⣀⡼⠹⠞                    ⠙⠛⢦⡤⠤⡄        ⠘⠛⣦⣄⣶    │
-                       │⣀⣸⢧⣀⣤⣠⠤⠤⠤⠤⠖⠶⠋⠁        ⣀⡤⠴⠋⠁                            ⠳⠟⢦⣀⣀⣤       ⠈⠛⠹⠞⠳│
-                       │ ⢀⡈⠁       ⣀⣀⣀⣠⣄⡶⠿⠴⠻⠞⠉⠁                                     ⠈⠉⠙⠲⠤⠤⣤⣤⢤⣀⣀⢀⣀│
-                   0.0%┤⠭⠭⠭⠽⠯⠭⠭⠭⠭⠭⠭⠷⠤⠤⠤⠤⠤⠤⠤⢤⡤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠴⠲⠶⠤⠤⠤⠤⠤⠤⠤⠤⣤⠼⠧⠤⠤⢤⡶⠤⣤⠤⠤⠤⠤⠤⠤⠤⠼⢧⡤⠤⠤⠤⠶⠭⠬⠭⢿│
-                       └00:00                                                            ┴23:59:00
-                        ● user 7.1%  ● system 2.2%  ● iowait 1.1%  ┃ 23:59:00
-↑↓ metric · ←→ cursor · Tab inst · <> day · +/- zoom · 0 reset · ? help · q quit
-```
+<p align="center"><img src="https://raw.githubusercontent.com/svy-tui/svy/main/assets/shot-cpu.png" width="880" alt="svy — CPU view with braille chart"></p>
 
-*（`svy --demo` 的真实终端输出，在真实终端中图表带有颜色）*
+*（`svy --demo` 的真实终端输出）*
 
 ## 10 秒上手（无需 sysstat）
 
@@ -76,75 +52,16 @@ npx @svy-tui/svy --demo
 **网络视图** — 每个网卡显示 rx/tx 两条彩色曲线，`Tab` 切换网卡，
 纵轴单位自动进位：
 
-```
-svy demo-host Linux 6.8.0-demo · x86_64 · 8 CPU · 2026-07-05 (2/2) · 1440 samples
-  CPU          Network [kB/s] — eth0 (1/2)
-  Memory       3.8 MB/s┤                                        ⣿                                │
-  Load avg             │                                  ⢠⢤    ⣿                                │
-❯ Network              │                                  ⢸⢸    ⣿⣶  ⣀ ⢸⡇ ⣶                       │
-  Disk I/O             │                                ⢰⣾⣿⢸   ⣀⣿⣿  ⣿ ⢸⡇ ⣿    ⢠⡄                 │
-  Disk util            │                                ⢸⣿⠉⠸⡄⣶⣤⡿⢿⣿  ⣿ ⢸⡇ ⣿    ⢸⡇                 │
-  IO tps               │                              ⣤⣀⣸   ⣿⢹⡏⠁ ⠈⠷⣆⣿⡀⢸⡇ ⣿    ⢸⡇                 │
-  Paging               │                            ⢠⣴⢻⣿⡇   ⠛⠈⠁    ⠿ ⢧⢸⡇ ⣿    ⢸⡇                 │
-                       │                         ⢸⣇⣸⣿ ⠘⠻⠇            ⢸⣸⡇ ⣿    ⢸⡇   ⣿             │
-               1.9 MB/s┤                         ⢸⠉⠛                  ⠛⢹⣤⣿    ⢸⡇   ⣿             │
-                       │      ⣤       ⢰⡆      ⣶ ⣿⡞                     ⠈⠙⢻⣤⢀⡀ ⢸⡇   ⣿             │
-                       │      ⣿       ⢸⡇  ⣀ ⢀⣰⠋⠷⠛⠃                       ⠈⠉⠿⣇ ⢸⡇   ⣿             │
-                       │      ⣿       ⢸⡇  ⣿ ⢸⠛                  ⣤           ⠘⠋⣿⣇⣿  ⣿             │
-                       │      ⣿       ⢸⡇ ⢸⠙⠾⠿           ⢀⣠⣼⢹   ⣀⣿⣶  ⣤ ⢰⡆ ⣶    ⢉⡸⢿  ⣿             │
-                       │      ⣿       ⢸⣧⣄⡏          ⢀⣀⣤⣤⡼⠛⠉⠈⣷⢻⡟⠋⠙⠛⠦⣤⠿⣄⢸⡇ ⣿    ⢸⡇⠘⠒⣆⣿             │
-                       │      ⣿      ⣰⢾⡉⠘⠃    ⣀ ⣀⣸⠓⠾⠛⠉⠈⠉⠁            ⠘⠾⢳⣤⣿⣀   ⢸⡇  ⠉⣿⠦⣄           │
-                       │      ⣿  ⣀⣠⣴⠚⠁⢸⡇ ⢀⣶⣀⣰⠶⠋⠓⠋⠁                       ⠈⠉⠛⠳⠴⣾⣇⣤  ⣿ ⠘⠲⢶⣀⡀       │
-                       │⢹  ⢀⣀⣠⣿⠖⠚⠉⠁⢀⣀⣠⣼⠷⠲⠏ ⠉⠉                                  ⠈⠙⠒⠦⠿⣤⣄⡀  ⠉⠳⠤⢤⣀⣀⡀ │
-                 0 kB/s┤⠺⠭⠭⠭⠤⠴⠛⠒⠒⠋⠉⠉                                                  ⠉⠉⠉⠓⠒⠒⠲⠤⠭⠭⠭│
-                       └00:00                                                            ┴23:59:00
-                        ● rx 116 kB/s  ● tx 41 kB/s  ┃ 23:59:00
-```
+<p align="center"><img src="https://raw.githubusercontent.com/svy-tui/svy/main/assets/shot-network.png" width="880" alt="svy — network view, rx/tx per interface"></p>
 
 **放大故障时段** — 按 `+` 以光标为中心收窄窗口，标题栏显示缩放范围。
 傍晚的流量尖峰一目了然：
 
-```
-svy demo-host Linux 6.8.0-demo · x86_64 · 8 CPU · 2026-07-05 (2/2) · 1440 samples · zoom 18:00–23:59
-  CPU          Network [kB/s] — eth0 (1/2)
-  Memory       7.6 MB/s┤              ⢸⡇
-  Load avg             │              ⢸⡇
-❯ Network              │              ⢸⡇
-  Disk I/O             │              ⢸⡇
-  Disk util            │              ⢸⡇
-  IO tps               │              ⢸⡇
-  Paging               │              ⢸⡇
-                       │              ⢸⡇
-               3.8 MB/s┤              ⢸⡇
-                       │              ⢸⡇
-                       │              ⢸⡇
-                       │              ⢸⡇
-                       │  ⣿           ⢸⡇
-                       │  ⣿           ⢸⡇
-                       │  ⣿           ⢸⡇
-                       │⠚⠙⣻⡖⢲⡿⠤⢶⡤⢤⣰⣆⣀⣠⣼⣧⡄
-                       │⣀⣀⣿⣀ ⣀ ⣀  ⠉⠈⠉⠁⢸⡏⠉⠉⠹⠞⠙⠋⠛⠹⠤⠶⢶⡤⢶⣰⠦⠤⣄⣀⣀⢀⣀⣀⣀⢀⣀⣀ ⢀⡀
-                 0 kB/s┤ ⠈⠉⠉⠉⠉⠉⠉⠉⠉⠉⠙⠛⠋⠉⠉⠙⠒⠒⠒⠛⠚⠛⠓⠒⠒⠲⠖⠲⠽⠒⠒⠶⠶⠮⠽⠦⠤⠬⠭⠬⠭⠭⠭⠭⠭⠭⠽⠶⠶⠶⠿⠶⠶⠶⠶⠶⠶⠶⠶⠶⠶⠶⠶⠶⢶⡶⠤⠶⠶⠶⠤│⣤
-                       └18:00                                                            ┴23:54:00
-                        ● rx 165 kB/s  ● tx 58 kB/s  ┃ 23:54:00
-```
+<p align="center"><img src="https://raw.githubusercontent.com/svy-tui/svy/main/assets/shot-zoom.png" width="880" alt="svy — zoomed into an evening traffic spike"></p>
 
 **帮助** — 按 `?` 无需离开应用即可查看所有快捷键：
 
-```
-  CPU            Keybindings
-  Memory         ↑/↓  k/j     select metric
-  Load avg       ←/→  h/l     move time cursor
-❯ Network        H/L          move cursor fast
-  Disk I/O       Tab  [ ]     switch instance (CPU/NIC/disk)
-  Disk util      < / >  , .   previous / next day
-  IO tps         + / -        zoom in / out around cursor
-  Paging         0            reset zoom
-                 g / G        jump to window start / end
-                 n            next host (multi-host JSON)
-                 ?            toggle this help
-                 q            quit
-```
+<p align="center"><img src="https://raw.githubusercontent.com/svy-tui/svy/main/assets/shot-help.png" width="880" alt="svy — keybindings help overlay"></p>
 
 ## 用法
 

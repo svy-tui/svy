@@ -23,33 +23,9 @@ an incident window, flip between days, and switch across CPU / memory / network
 / disk — right in the terminal where the data lives. No files generated, no GUI,
 no agent to install on servers.
 
-```
-svy demo-host Linux 6.8.0-demo · x86_64 · 8 CPU · 2026-07-05 (2/2) · 1440 samples
-❯ CPU          CPU [%] — all (1/3)
-  Memory          54.0%┤                                 ⣿ ⣀                                     │
-  Load avg             │                                ⡤⠿⡄⡏⡇⢸⡇                                  │
-  Network              │                                ⡇ ⠙⠃⠷⠋⡇    ⣀                             │
-  Disk I/O             │                               ⡴⠃     ⠉⠓⠚⣇⢠⢿⣀⡟⡆                          │
-  Disk util            │                              ⢰⠃         ⠈⣿ ⠈⠁⣇ ⢠⡄                       │
-  IO tps               │                             ⢀⡏               ⠘⣆⡏⡇                       │
-  Paging               │                            ⣤⢸                 ⠉ ⠓⡆                      │
-                       │                           ⢀⡿⠞                    ⠉⠧⡄                    │
-                  27.0%┤                           ⡞                        ⢹⣿⡀                  │
-                       │                          ⡞⠁                        ⠘⠃⠷⡆                 │
-                       │                        ⣠⠶⠇                            ⠹⠴⡆               │
-                       │                      ⣀⣸⠁        ⣶⡀⣤ ⢀⡀                  ⢹ ⣤⣤            │
-                       │                    ⢀⣠⠇       ⢀⣀⡏⠁⠓⠋⠓⠚⣇⣠⣄ ⢀⣠⣄⣰⡆ ⢀⡀       ⠈⠙⠛⢻            │
-                       │                ⣶⣶⢠⠿⠞      ⢀⡀⢠⣼       ⠉⠉⠈⠉⠛ ⠉ ⠳⣄⡏⣷⡆⣀        ⠘⠋⠳⣄⣀        │
-                       │             ⣀⣠⠤⠟⠋⠉       ⣀⡼⠹⠞                    ⠙⠛⢦⡤⠤⡄        ⠘⠛⣦⣄⣶    │
-                       │⣀⣸⢧⣀⣤⣠⠤⠤⠤⠤⠖⠶⠋⠁        ⣀⡤⠴⠋⠁                            ⠳⠟⢦⣀⣀⣤       ⠈⠛⠹⠞⠳│
-                       │ ⢀⡈⠁       ⣀⣀⣀⣠⣄⡶⠿⠴⠻⠞⠉⠁                                     ⠈⠉⠙⠲⠤⠤⣤⣤⢤⣀⣀⢀⣀│
-                   0.0%┤⠭⠭⠭⠽⠯⠭⠭⠭⠭⠭⠭⠷⠤⠤⠤⠤⠤⠤⠤⢤⡤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠤⠴⠲⠶⠤⠤⠤⠤⠤⠤⠤⠤⣤⠼⠧⠤⠤⢤⡶⠤⣤⠤⠤⠤⠤⠤⠤⠤⠼⢧⡤⠤⠤⠤⠶⠭⠬⠭⢿│
-                       └00:00                                                            ┴23:59:00
-                        ● user 7.1%  ● system 2.2%  ● iowait 1.1%  ┃ 23:59:00
-↑↓ metric · ←→ cursor · Tab inst · <> day · +/- zoom · 0 reset · ? help · q quit
-```
+<p align="center"><img src="https://raw.githubusercontent.com/svy-tui/svy/main/assets/shot-cpu.png" width="880" alt="svy — CPU view with braille chart"></p>
 
-*(actual terminal output of `svy --demo` — charts are colored in a real terminal)*
+*(actual `svy --demo` output in a 100×24 terminal)*
 
 ## Try it in 10 seconds (no sysstat required)
 
@@ -81,75 +57,16 @@ in time; past days are synthesized on the fly.
 **Network view** — two colored series (rx/tx) per interface, `Tab` switches NICs,
 the y-axis scales units automatically:
 
-```
-svy demo-host Linux 6.8.0-demo · x86_64 · 8 CPU · 2026-07-05 (2/2) · 1440 samples
-  CPU          Network [kB/s] — eth0 (1/2)
-  Memory       3.8 MB/s┤                                        ⣿                                │
-  Load avg             │                                  ⢠⢤    ⣿                                │
-❯ Network              │                                  ⢸⢸    ⣿⣶  ⣀ ⢸⡇ ⣶                       │
-  Disk I/O             │                                ⢰⣾⣿⢸   ⣀⣿⣿  ⣿ ⢸⡇ ⣿    ⢠⡄                 │
-  Disk util            │                                ⢸⣿⠉⠸⡄⣶⣤⡿⢿⣿  ⣿ ⢸⡇ ⣿    ⢸⡇                 │
-  IO tps               │                              ⣤⣀⣸   ⣿⢹⡏⠁ ⠈⠷⣆⣿⡀⢸⡇ ⣿    ⢸⡇                 │
-  Paging               │                            ⢠⣴⢻⣿⡇   ⠛⠈⠁    ⠿ ⢧⢸⡇ ⣿    ⢸⡇                 │
-                       │                         ⢸⣇⣸⣿ ⠘⠻⠇            ⢸⣸⡇ ⣿    ⢸⡇   ⣿             │
-               1.9 MB/s┤                         ⢸⠉⠛                  ⠛⢹⣤⣿    ⢸⡇   ⣿             │
-                       │      ⣤       ⢰⡆      ⣶ ⣿⡞                     ⠈⠙⢻⣤⢀⡀ ⢸⡇   ⣿             │
-                       │      ⣿       ⢸⡇  ⣀ ⢀⣰⠋⠷⠛⠃                       ⠈⠉⠿⣇ ⢸⡇   ⣿             │
-                       │      ⣿       ⢸⡇  ⣿ ⢸⠛                  ⣤           ⠘⠋⣿⣇⣿  ⣿             │
-                       │      ⣿       ⢸⡇ ⢸⠙⠾⠿           ⢀⣠⣼⢹   ⣀⣿⣶  ⣤ ⢰⡆ ⣶    ⢉⡸⢿  ⣿             │
-                       │      ⣿       ⢸⣧⣄⡏          ⢀⣀⣤⣤⡼⠛⠉⠈⣷⢻⡟⠋⠙⠛⠦⣤⠿⣄⢸⡇ ⣿    ⢸⡇⠘⠒⣆⣿             │
-                       │      ⣿      ⣰⢾⡉⠘⠃    ⣀ ⣀⣸⠓⠾⠛⠉⠈⠉⠁            ⠘⠾⢳⣤⣿⣀   ⢸⡇  ⠉⣿⠦⣄           │
-                       │      ⣿  ⣀⣠⣴⠚⠁⢸⡇ ⢀⣶⣀⣰⠶⠋⠓⠋⠁                       ⠈⠉⠛⠳⠴⣾⣇⣤  ⣿ ⠘⠲⢶⣀⡀       │
-                       │⢹  ⢀⣀⣠⣿⠖⠚⠉⠁⢀⣀⣠⣼⠷⠲⠏ ⠉⠉                                  ⠈⠙⠒⠦⠿⣤⣄⡀  ⠉⠳⠤⢤⣀⣀⡀ │
-                 0 kB/s┤⠺⠭⠭⠭⠤⠴⠛⠒⠒⠋⠉⠉                                                  ⠉⠉⠉⠓⠒⠒⠲⠤⠭⠭⠭│
-                       └00:00                                                            ┴23:59:00
-                        ● rx 116 kB/s  ● tx 41 kB/s  ┃ 23:59:00
-```
+<p align="center"><img src="https://raw.githubusercontent.com/svy-tui/svy/main/assets/shot-network.png" width="880" alt="svy — network view, rx/tx per interface"></p>
 
 **Zoom into an incident** — `+` narrows the window around the cursor; the header
 shows the zoomed range. That evening spike is suddenly obvious:
 
-```
-svy demo-host Linux 6.8.0-demo · x86_64 · 8 CPU · 2026-07-05 (2/2) · 1440 samples · zoom 18:00–23:59
-  CPU          Network [kB/s] — eth0 (1/2)
-  Memory       7.6 MB/s┤              ⢸⡇
-  Load avg             │              ⢸⡇
-❯ Network              │              ⢸⡇
-  Disk I/O             │              ⢸⡇
-  Disk util            │              ⢸⡇
-  IO tps               │              ⢸⡇
-  Paging               │              ⢸⡇
-                       │              ⢸⡇
-               3.8 MB/s┤              ⢸⡇
-                       │              ⢸⡇
-                       │              ⢸⡇
-                       │              ⢸⡇
-                       │  ⣿           ⢸⡇
-                       │  ⣿           ⢸⡇
-                       │  ⣿           ⢸⡇
-                       │⠚⠙⣻⡖⢲⡿⠤⢶⡤⢤⣰⣆⣀⣠⣼⣧⡄
-                       │⣀⣀⣿⣀ ⣀ ⣀  ⠉⠈⠉⠁⢸⡏⠉⠉⠹⠞⠙⠋⠛⠹⠤⠶⢶⡤⢶⣰⠦⠤⣄⣀⣀⢀⣀⣀⣀⢀⣀⣀ ⢀⡀
-                 0 kB/s┤ ⠈⠉⠉⠉⠉⠉⠉⠉⠉⠉⠙⠛⠋⠉⠉⠙⠒⠒⠒⠛⠚⠛⠓⠒⠒⠲⠖⠲⠽⠒⠒⠶⠶⠮⠽⠦⠤⠬⠭⠬⠭⠭⠭⠭⠭⠭⠽⠶⠶⠶⠿⠶⠶⠶⠶⠶⠶⠶⠶⠶⠶⠶⠶⠶⢶⡶⠤⠶⠶⠶⠤│⣤
-                       └18:00                                                            ┴23:54:00
-                        ● rx 165 kB/s  ● tx 58 kB/s  ┃ 23:54:00
-```
+<p align="center"><img src="https://raw.githubusercontent.com/svy-tui/svy/main/assets/shot-zoom.png" width="880" alt="svy — zoomed into an evening traffic spike"></p>
 
 **Help** — `?` shows every keybinding without leaving the app:
 
-```
-  CPU            Keybindings
-  Memory         ↑/↓  k/j     select metric
-  Load avg       ←/→  h/l     move time cursor
-❯ Network        H/L          move cursor fast
-  Disk I/O       Tab  [ ]     switch instance (CPU/NIC/disk)
-  Disk util      < / >  , .   previous / next day
-  IO tps         + / -        zoom in / out around cursor
-  Paging         0            reset zoom
-                 g / G        jump to window start / end
-                 n            next host (multi-host JSON)
-                 ?            toggle this help
-                 q            quit
-```
+<p align="center"><img src="https://raw.githubusercontent.com/svy-tui/svy/main/assets/shot-help.png" width="880" alt="svy — keybindings help overlay"></p>
 
 ## Usage
 
