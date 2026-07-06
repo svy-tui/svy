@@ -1,0 +1,91 @@
+{
+  "sysstat": {
+    "hosts": [
+      {
+        "nodename": "web01",
+        "sysname": "Linux",
+        "release": "6.8.0-45-generic",
+        "machine": "x86_64",
+        "number-of-cpus": 2,
+        "file-date": "2026-07-05",
+        "file-utc-time": "00:00:00",
+        "timezone": "UTC",
+        "statistics": [
+          {
+            "timestamp": {"date": "2026-07-05", "time": "00:10:00", "utc": 1, "interval": 600},
+            "cpu-load": [
+              {"cpu": "all", "user": 10.0, "nice": 0.0, "system": 5.0, "iowait": 1.0, "steal": 0.0, "idle": 84.0},
+              {"cpu": "0", "user": 12.0, "nice": 0.0, "system": 6.0, "iowait": 1.5, "steal": 0.0, "idle": 80.5},
+              {"cpu": "1", "user": 8.0, "nice": 0.0, "system": 4.0, "iowait": 0.5, "steal": 0.0, "idle": 87.5}
+            ],
+            "io": {"tps": 12.0, "io-reads": {"rtps": 4.0, "bread": 100.0}, "io-writes": {"wtps": 8.0, "bwrtn": 200.0}},
+            "memory": {
+              "memfree": 500000, "avail": 1500000, "memused": 2500000, "memused-percent": 62.5,
+              "buffers": 10000, "cached": 800000, "commit": 3000000, "commit-percent": 45.0,
+              "active": 1200000, "inactive": 600000, "dirty": 5000,
+              "swpfree": 900000, "swpused": 100000, "swpused-percent": 10.0
+            },
+            "paging": {"pgpgin": 50.0, "pgpgout": 120.0, "fault": 300.0, "majflt": 0.5},
+            "queue": {"runq-sz": 1, "plist-sz": 210, "ldavg-1": 0.5, "ldavg-5": 0.4, "ldavg-15": 0.3, "blocked": 0},
+            "disk": [
+              {"disk-device": "sda", "tps": 10.0, "rkB/s": 100.0, "wkB/s": 200.0, "areq-sz": 30.0, "aqu-sz": 0.05, "await": 1.2, "util-percent": 3.5}
+            ],
+            "network": {
+              "net-dev": [
+                {"iface": "eth0", "rxpck": 100.0, "txpck": 80.0, "rxkB": 512.0, "txkB": 256.0, "rxcmp": 0.0, "txcmp": 0.0, "rxmcst": 0.0, "ifutil-percent": 0.4}
+              ]
+            }
+          },
+          {
+            "timestamp": {"date": "2026-07-05", "time": "00:20:00", "utc": 1, "interval": 600},
+            "cpu-load": [
+              {"cpu": "all", "user": 20.0, "nice": 0.0, "system": 10.0, "iowait": 2.0, "steal": 0.0, "idle": 68.0},
+              {"cpu": "0", "user": 22.0, "nice": 0.0, "system": 11.0, "iowait": 2.5, "steal": 0.0, "idle": 64.5},
+              {"cpu": "1", "user": 18.0, "nice": 0.0, "system": 9.0, "iowait": 1.5, "steal": 0.0, "idle": 71.5}
+            ],
+            "io": {"tps": 24.0, "io-reads": {"rtps": 8.0, "bread": 200.0}, "io-writes": {"wtps": 16.0, "bwrtn": 400.0}},
+            "memory": {
+              "memfree": 400000, "avail": 1400000, "memused": 2600000, "memused-percent": 65.0,
+              "buffers": 10000, "cached": 800000, "commit": 3100000, "commit-percent": 46.5,
+              "active": 1250000, "inactive": 610000, "dirty": 6000,
+              "swpfree": 880000, "swpused": 120000, "swpused-percent": 12.0
+            },
+            "paging": {"pgpgin": 60.0, "pgpgout": 130.0, "fault": 310.0, "majflt": 0.6},
+            "queue": {"runq-sz": 2, "plist-sz": 215, "ldavg-1": 0.8, "ldavg-5": 0.6, "ldavg-15": 0.4, "blocked": 0},
+            "network": {
+              "net-dev": [
+                {"iface": "eth0", "rxpck": 120.0, "txpck": 90.0, "rxkB": 640.0, "txkB": 300.0, "rxcmp": 0.0, "txcmp": 0.0, "rxmcst": 0.0, "ifutil-percent": 0.5}
+              ]
+            }
+          },
+          {
+            "timestamp": {"date": "2026-07-05", "time": "00:30:00", "utc": 1, "interval": 600},
+            "cpu-load": [
+              {"cpu": "all", "user": 30.0, "nice": 0.0, "system": 15.0, "iowait": 3.0, "steal": 0.0, "idle": 52.0},
+              {"cpu": "0", "user": 32.0, "nice": 0.0, "system": 16.0, "iowait": 3.5, "steal": 0.0, "idle": 48.5},
+              {"cpu": "1", "user": 28.0, "nice": 0.0, "system": 14.0, "iowait": 2.5, "steal": 0.0, "idle": 55.5}
+            ],
+            "io": {"tps": 36.0, "io-reads": {"rtps": 12.0, "bread": 300.0}, "io-writes": {"wtps": 24.0, "bwrtn": 600.0}},
+            "memory": {
+              "memfree": 300000, "avail": 1300000, "memused": 2700000, "memused-percent": 67.5,
+              "buffers": 10000, "cached": 800000, "commit": 3200000, "commit-percent": 48.0,
+              "active": 1300000, "inactive": 620000, "dirty": 7000,
+              "swpfree": 860000, "swpused": 140000, "swpused-percent": 14.0
+            },
+            "paging": {"pgpgin": 70.0, "pgpgout": 140.0, "fault": 320.0, "majflt": 0.7},
+            "queue": {"runq-sz": 3, "plist-sz": 220, "ldavg-1": 1.2, "ldavg-5": 0.9, "ldavg-15": 0.5, "blocked": 1},
+            "disk": [
+              {"disk-device": "sda", "tps": 30.0, "rkB/s": 300.0, "wkB/s": 600.0, "areq-sz": 30.0, "aqu-sz": 0.15, "await": 1.8, "util-percent": 9.5}
+            ],
+            "network": {
+              "net-dev": [
+                {"iface": "eth0", "rxpck": 140.0, "txpck": 100.0, "rxkB": 768.0, "txkB": 350.0, "rxcmp": 0.0, "txcmp": 0.0, "rxmcst": 0.0, "ifutil-percent": 0.6},
+                {"iface": "eth1", "rxpck": 10.0, "txpck": 5.0, "rxkB": 32.0, "txkB": 16.0, "rxcmp": 0.0, "txcmp": 0.0, "rxmcst": 0.0, "ifutil-percent": 0.1}
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
