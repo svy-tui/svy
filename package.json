@@ -1,0 +1,51 @@
+{
+  "name": "sadf-view",
+  "version": "0.1.0",
+  "description": "Interactive terminal viewer for sysstat/sar historical data — like btop, but for the past",
+  "type": "module",
+  "bin": {
+    "sadf-view": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.18"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run test && npm run build"
+  },
+  "keywords": [
+    "sysstat",
+    "sar",
+    "sadf",
+    "tui",
+    "cli",
+    "terminal",
+    "monitoring",
+    "performance",
+    "ink"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ckearlgrey/sadf-view.git"
+  },
+  "dependencies": {
+    "chalk": "^5.6.2",
+    "ink": "^7.1.0",
+    "react": "^19.2.7"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "ink-testing-library": "^4.0.0",
+    "typescript": "^5.6.2",
+    "vitest": "^4.1.9"
+  }
+}
