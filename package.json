@@ -1,6 +1,6 @@
 {
   "name": "@svy-tui/svy",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "svy — system viewer for sar. Interactive terminal viewer for sysstat historical data, like btop but for the past",
   "type": "module",
   "bin": {
