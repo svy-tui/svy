@@ -6,10 +6,12 @@ Please report suspected vulnerabilities in `svy` privately. On GitHub, open the
 [Security tab](https://github.com/svy-tui/svy/security) and select **Report a
 vulnerability**, if available.
 
-If the private reporting option is unavailable, open a
-[GitHub issue](https://github.com/svy-tui/svy/issues/new) asking the maintainers
-for a private contact. Do not include vulnerability details, logs, or sample
-files in that public issue.
+If GitHub private reporting is unavailable, use the
+[MarginalGains contact form](https://marginalgains.jp/contact/) to request a private
+follow-up. Start your message with `[svy security]` and provide only a brief,
+non-sensitive summary. If you are reporting as an individual, enter `Individual`
+in the company name field. Wait for a reply before sharing technical details,
+logs, or sample files. Do not post vulnerability details in a public GitHub issue.
 
 In a private report, please include:
 
