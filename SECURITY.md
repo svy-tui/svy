@@ -1,0 +1,26 @@
+# Security Policy
+
+## Reporting a vulnerability
+
+Please report suspected vulnerabilities in `svy` privately. On GitHub, open the
+[Security tab](https://github.com/svy-tui/svy/security) and select **Report a
+vulnerability**, if available.
+
+If the private reporting option is unavailable, open a
+[GitHub issue](https://github.com/svy-tui/svy/issues/new) asking the maintainers
+for a private contact. Do not include vulnerability details, logs, or sample
+files in that public issue.
+
+In a private report, please include:
+
+- The affected version of `@svy-tui/svy` or commit, and the relevant platform
+  and Node.js version.
+- A short description of the issue, its impact, and any prerequisites.
+- Enough detail to reproduce the issue safely, using a minimal synthetic
+  example where possible.
+
+Remove credentials, SSH keys, private hostnames, and other sensitive data
+from logs and examples. Test only on systems you own or have permission to use.
+
+Please coordinate with the maintainers before publicly disclosing technical
+details so there is time to assess the report and prepare a fix.
