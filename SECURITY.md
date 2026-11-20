@@ -7,11 +7,11 @@ Please report suspected vulnerabilities in `svy` privately. On GitHub, open the
 vulnerability**, if available.
 
 If GitHub private reporting is unavailable, use the
-[MarginalGains contact form](https://marginalgains.jp/contact/) to request a private
-follow-up. Start your message with `[svy security]` and provide only a brief,
-non-sensitive summary. If you are reporting as an individual, enter `Individual`
-in the company name field. Wait for a reply before sharing technical details,
-logs, or sample files. Do not post vulnerability details in a public GitHub issue.
+[ecoop.net contact form](https://docs.google.com/forms/d/e/1FAIpQLSc45mN6q6cubwjA9MhUK_x-_ssP1ZKI8EUPQV8YxGjHhKoBHw/viewform)
+to request a private follow-up. Start your message with `[svy security]` and
+include a way to reach you and a brief, non-sensitive summary. Wait for a reply
+before sharing technical details, logs, or sample files. Do not post
+vulnerability details in a public GitHub issue.
 
 In a private report, please include:
 
